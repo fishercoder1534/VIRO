@@ -62,7 +62,7 @@ def findAGW(rdvStore,k,svid):
     s.sort()
     
     # return the gateway with least logical distance
-    # TODO: return at most three gateways here
+    # TODO: return at most three gateways here just test
     return gw[s[0]]
 
 #######################################
