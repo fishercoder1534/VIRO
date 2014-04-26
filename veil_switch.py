@@ -62,7 +62,7 @@ def findAGW(rdvStore,k,svid):
     s.sort()
     
     # return the gateway with least logical distance
-    # TODO: return at most three gateways here just test
+    # TODO: return at most three gateways here
     return gw[s[0]]
 
 #######################################
@@ -145,7 +145,9 @@ def processPacket(packet):
         nh = int(pid2vid[nexthop],2)
         
         # prepare routingTable entry
-        bucket_info = [nh, gw, getPrefix(myvid,k)]
+        # RJZ: Added Default field
+        default = True
+        bucket_info = [nh, gw, getPrefix(myvid,k), default]
         routingTable[k] = []
         
         # insert entry into routingTable
@@ -172,7 +174,8 @@ def getNextHop(destvid_str):
     
     # return node from routingTable with dist
     if dist in routingTable:
-        nexthop = bin2str(routingTable[dist][0][0],L)
+        #RJZ: Added default check
+        nexthop = bin2str(routingTable[dist][0][0][True],L)
         nexthop = vid2pid[nexthop]
         
     return nexthop
@@ -253,7 +256,8 @@ def routepacket(packet):
             break
             
         if dist in routingTable:
-            nexthop = bin2str(routingTable[dist][0][0],L)
+            #RJZ: Added default check
+            nexthop = bin2str(routingTable[dist][0][0][True],L)
             nexthop = vid2pid[nexthop]
             break
             
@@ -452,7 +456,9 @@ for vid in vid2pid: # iterate for every vid in vid2pid list
     # getPrefix(myvid,dist), flips the dist^th bit and makes RHS of dist as * 
     #   eg. getPrefix('0101', 3) will return '00**'
     #	format[dist] = <Nexthop vid>, <gateway vid>, <prefix>
-    bucket_info = [int(vid,2), int(myvid,2), getPrefix(myvid,dist)]    
+    # RJZ: added default
+    default = True
+    bucket_info = [int(vid,2), int(myvid,2), getPrefix(myvid,dist), default]    
     
     if not isDuplicateBucket(routingTable[dist], bucket_info):
         routingTable[dist].append(bucket_info) # add bucket_into to routingTable[dist]
@@ -467,7 +473,7 @@ while True:
     for i in range(1,L+1):
         if i in routingTable:
             for j in routingTable[i]:
-                print 'Bucket #', i, 'Nexthop:',bin2str(j[0],L), 'Gateway:',bin2str(j[1],L), 'Prefix:',j[2]
+                print 'Bucket #', i, 'Nexthop:',bin2str(j[0],L), 'Gateway:',bin2str(j[1],L), 'Prefix:',j[2], 'Default:', j[3]
         else:
             print 'Bucket #',i,'  --- E M P T Y --- '
     print 'RDV STORE: ', rdvStore

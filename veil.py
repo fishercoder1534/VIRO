@@ -268,7 +268,7 @@ def getPrefix(vid,dist):
 def isDuplicateBucket(bucketlist,bucket):
     isduplicate = False
     for i in range(0, len(bucketlist)):
-        if bucketlist[i][0] == bucket[0] and bucketlist[i][1] == bucket[1] and bucketlist[i][2] == bucket[2]:
+        if bucketlist[i][0] == bucket[0] and bucketlist[i][1] == bucket[1] and bucketlist[i][2] == bucket[2] and bucketlist[i][3] == bucket[3]:
             isduplicate = True
             return isduplicate
     return isduplicate
