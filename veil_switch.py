@@ -142,29 +142,12 @@ def processPacket(packet):
         [gw1] = struct.unpack("!I", packet[24:28])
         [gw2] = struct.unpack("!I", packet[28:32])
 
-        gw0_str = bin2str(gw0,L)
-        gw1_str = bin2str(gw1,L)
-        gw2_str = bin2str(gw2,L)
         k = int(payload,2)
         
         if k in routingTable:
             print myprintid, 'Already have an entry to reach neighbors at distance: ',k
             return
-        
-        # get nextHop using routingTable to reach Gateway [gw0_str]    
-        # RJZ: we do this for gw0_str since 0 is our default, which we will set
-        #      below
-        nexthop = getNextHop(gw0_str)
-        
-        # TODO: In the future, check gw1_str and gw2_str instead of returning
-        if nexthop == '':
-            print 'ERROR: no nexthop found for the gateway:',gw0_str
-            print 'New routing information couldnt be added! '
-            return
-        
-        # convert nextHop from binary to decimal    
-        nh = int(pid2vid[nexthop],2)
-        
+
         # prepare routingTable entry
         # RJZ: Added Default field
         routingTable[k] = []
@@ -178,9 +161,22 @@ def processPacket(packet):
             elif i == 2:
                 gw = gw2
                 default = False
-            if gw == 0x0:
-                continue
 
+            # gw == 0 is a indication that this entry should be skipped
+            if gw == 0:
+                continue
+        
+            # get nextHop using routingTable to reach Gateway [gw0_str]    
+            # RJZ: Get the next hop for each valid gateway
+            nexthop = getNextHop(bin2str(gw,L))
+            if nexthop == '':
+                print 'ERROR: no nexthop found for the gateway:',bin2str(gw,L)
+                print 'New routing information couldnt be added! '
+                continue
+        
+            # convert nextHop from binary to decimal    
+            nh = int(pid2vid[nexthop],2)
+        
             bucket_info = [nh, gw, getPrefix(myvid,k), default]
     
             # insert entry into routingTable
@@ -198,6 +194,7 @@ def processPacket(packet):
 
 def getNextHop(destvid_str):
     nexthop = ''
+    print myprintid, 'Finding nexthop for', destvid_str
     
     # if dest is neighbor return 
     if destvid_str in vid2pid:
@@ -208,9 +205,7 @@ def getNextHop(destvid_str):
     
     # return node from routingTable with dist
     if dist in routingTable:
-        #RJZ: Added default check
         nexthop = bin2str(routingTable[dist][0][0],L)
-        print myprintid, 'nexthop: ', nexthop
         nexthop = vid2pid[nexthop]
         
     return nexthop
