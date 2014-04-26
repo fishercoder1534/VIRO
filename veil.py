@@ -298,8 +298,8 @@ def createRDV_PUBLISH(bucket,myvid,dst):
 
 # create a RDV_REPLY Pakcet
 # GW IS AN INT HERE! AND REST ARE BINARY STRINGS
-# TODO: Accept multiple gateways as arguments here
-def createRDV_REPLY(gw,bucket_dist,myvid, dst):
+# RJZ: Accept multiple gateways as arguments here
+def createRDV_REPLY(gw0,gw1,gw2,bucket_dist,myvid, dst):
     # First prepare header
     packet = struct.pack("!HHBBH",HTYPE,PTYPE,HLEN,PLEN,RDV_REPLY)
     # Sender VID (32 bits)
@@ -311,8 +311,7 @@ def createRDV_REPLY(gw,bucket_dist,myvid, dst):
     buck_dist = struct.pack("!I",bucket_dist)
     
     # Destination Subtree-k
-    z = struct.pack("!I",gw)
-
+    z = struct.pack("!III",gw0,gw1,gw2)
 
     return (packet+svid+dvid+buck_dist+z)    
 

@@ -42,7 +42,7 @@ def findAGW(rdvStore,k,svid):
     
     # if no entry return blank string
     if k not in rdvStore:
-        return ''
+        return ('','','')
     
     # for every entry in rdvStore, add Gateway to gateway set {gw}
     for t in rdvStore[k]:
@@ -53,17 +53,23 @@ def findAGW(rdvStore,k,svid):
         gw[r] = t[0]
         
     if len(gw) == 0:
-        return ''    
+        return ('','','')
     
     # get all the keys from the gateway set {gw}
     s = gw.keys()
     
     # sort based on logical distance
     s.sort()
-    
+
     # return the gateway with least logical distance
-    # TODO: return at most three gateways here
-    return gw[s[0]]
+    # RJZ: return entire gateway set
+    if len(gw) == 1:
+        return (gw[s[0]], '0', '0')
+    elif len(gw) == 2:
+        return (gw[s[0]], gw[s[1]], '0')
+    else:
+        return (gw[s[0]], gw[s[1]], gw[s[2]])
+
 
 #######################################
 #    PROCESSPACKET FUNCTION
@@ -107,37 +113,52 @@ def processPacket(packet):
         k = int(payload,2)
         
         # search in rdvStore for the logically closest gateway to reach kth distance away neighbor
-        gw = findAGW(rdvStore,k,svid)
-        
+        #RJZ: Pick our three gateways based on the three closest
+        (gw0, gw1, gw2) = findAGW(rdvStore,k,svid)
+
         # no gateway found
-        if gw == '':
+        if gw0 == '':
             print myprintid, 'No gateway found for the rdv_query packet to reach bucket: ',k,' for node: ', svid
             return
+        else:
+            gw_0 = int(gw0,2)
+
+        # If we dont' have gw1 or gw2, that's fine, set them to 0 instead of ''
+        gw_1 = int(gw1,2)
+        gw_2 = int(gw2,2)
         
         # gateway found, form reply packet and sent to svid
         # create a RDV_REPLY packet and send it
-        # TODO: Pass the set of gatways here
-        replypacket = createRDV_REPLY(int(gw,2),k,myvid, svid)
+        # RJZ: Pass three gateways here
+        print myprintid, 'gw0: ', gw_0, ' gw1: ', gw_1, ' gw2: ', gw_2
+        replypacket = createRDV_REPLY(gw_0,gw_1,gw_2,k,myvid,svid)
         routepacket(replypacket)
         return
         
     elif packettype == RDV_REPLY:
         # Fill my routing table using this new information
-        [gw] = struct.unpack("!I", packet[20:24])
-        # TODO: unpack second and third gatways and add them to the routing table
+        # RJZ: unpack second and third gatways and add them to the routing table
+        [gw0] = struct.unpack("!I", packet[20:24])
+        [gw1] = struct.unpack("!I", packet[24:28])
+        [gw2] = struct.unpack("!I", packet[28:32])
 
-        gw_str = bin2str(gw,L)
+        gw0_str = bin2str(gw0,L)
+        gw1_str = bin2str(gw1,L)
+        gw2_str = bin2str(gw2,L)
         k = int(payload,2)
         
         if k in routingTable:
             print myprintid, 'Already have an entry to reach neighbors at distance: ',k
             return
         
-        # get nextHop using routingTable to reach Gateway [gw_str]    
-        nexthop = getNextHop(gw_str)
+        # get nextHop using routingTable to reach Gateway [gw0_str]    
+        # RJZ: we do this for gw0_str since 0 is our default, which we will set
+        #      below
+        nexthop = getNextHop(gw0_str)
         
+        # TODO: In the future, check gw1_str and gw2_str instead of returning
         if nexthop == '':
-            print 'ERROR: no nexthop found for the gateway:',gw_str
+            print 'ERROR: no nexthop found for the gateway:',gw0_str
             print 'New routing information couldnt be added! '
             return
         
@@ -146,12 +167,25 @@ def processPacket(packet):
         
         # prepare routingTable entry
         # RJZ: Added Default field
-        default = True
-        bucket_info = [nh, gw, getPrefix(myvid,k), default]
         routingTable[k] = []
-        
-        # insert entry into routingTable
-        routingTable[k].append(bucket_info)
+        for i in range(0,3):
+            if i == 0:
+                gw = gw0
+                default = True
+            elif i == 1:
+                gw = gw1
+                default = False
+            elif i == 2:
+                gw = gw2
+                default = False
+            if gw == 0x0:
+                continue
+
+            bucket_info = [nh, gw, getPrefix(myvid,k), default]
+    
+            # insert entry into routingTable
+            routingTable[k].append(bucket_info)
+
     else:
         print myprintid, 'Unexpected Packet!!'
         
@@ -175,7 +209,8 @@ def getNextHop(destvid_str):
     # return node from routingTable with dist
     if dist in routingTable:
         #RJZ: Added default check
-        nexthop = bin2str(routingTable[dist][0][0][True],L)
+        nexthop = bin2str(routingTable[dist][0][0],L)
+        print myprintid, 'nexthop: ', nexthop
         nexthop = vid2pid[nexthop]
         
     return nexthop
@@ -257,7 +292,7 @@ def routepacket(packet):
             
         if dist in routingTable:
             #RJZ: Added default check
-            nexthop = bin2str(routingTable[dist][0][0][True],L)
+            nexthop = bin2str(routingTable[dist][0][0],L)
             nexthop = vid2pid[nexthop]
             break
             
