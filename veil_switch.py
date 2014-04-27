@@ -269,8 +269,10 @@ def routepacket(packet):
     # TODO: Choose path based on forwarding directive to support multi-path
     #       routing
     # TODO: After we find the nexthop, we test to see if that node is functional
+    #       *Use createEchoRequestPacket for this*
     #       if so, send to that node
     #       if not, we update the routing table: remove this record from table
+    #         *Use routingTable.remove()*
     #         after this, we look for the next nexthop
     # TODO: Question: what happens if we run out of nexthops?
     #       notify source? drop packet?
