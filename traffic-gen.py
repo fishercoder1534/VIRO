@@ -54,7 +54,7 @@ def gen_traffic(my_ip_pt, pkt, rate):
             conn.send(pkt)
             conn.close() # one-shot, non-persistent for simplicity
         except:
-            print "Failed to send packets to <my_ip:my_port>."
+            print "Failed to send packets to", my_ip, my_pt
             sys.exit(1)
 
 if __name__ == "__main__":
