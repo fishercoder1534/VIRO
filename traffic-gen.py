@@ -68,6 +68,16 @@ if __name__ == "__main__":
             32bit fwd_vid (initialized to dst_vid), 8bit TTL (initialized to 64)
         '''
         # TODO: Add FWD-VID and TTL fields
+	
+	'''
+	Steve: So, I was going to do task 2 but got stuck here:as the assignment says, part 1 of task 2 is to add 
+	FWD-VID and TTL fields into the data packet format, but here, in this initial given code, both FWD-VID and TTL 
+	field had been given and initialized, FWD-VID had been initialized to dst_vid and TTL had been initialized to 64, so what
+	else are we supposed to do? Where and how should we modify packet definition to add these two new fields?
+	I've searched through veil.py and veil_switch.py but all packets in those files are CONTROL packets instead
+	of data packets. Any one can give me any help please?
+	'''
+
         pkt = struct.pack('!HHBBH', HTYPE, PTYPE, HLEN, PLEN, 0x0000)\
             + struct.pack('!I', int(my_vid, 2))\
             + struct.pack('!I', int(dst_vid,2))\
