@@ -239,6 +239,34 @@ def sendPacket(packet,nexthop):
 #    routepacket function starts here
 ###############################################
 
+
+'''
+Steve: I've written these two functions here, but I'm
+not sure if they should be placed here or in veil.py.
+Also, I was wondering in updateFwdVid function, I didn't
+specify TTL field, should we add it here?
+'''
+def getFwdVid(packet, L):
+    t = struct.unpack("!I", packet[16:20])
+    FwdVid = bin2str(t[0],L)
+    return FwdVid
+
+def updateFwdVid(packet, FwdVid):
+    header = packet[:8]
+    sender = packet[8:12]
+    dest = packet[12:16]
+    FwdVid = packet[16:20]
+    payload = packet[20:]
+    return (header+sender+dest+FwdVid+payload)
+
+'''
+Thank you a lot Rob for giving me these very useful hints:
+I went thru warm-up exercise again today as you said, and I know FwdVid should
+be set as its level-k gateway in phase I and after reaching the gateway, reset
+the FwdVid as the final dest, so how can we get the correct gateway vid? Sorry for begging help again. I was really confused here.
+'''
+
+
 def routepacket(packet):
     global myvid, routingTable, vid2pid, myprintid, L
 
