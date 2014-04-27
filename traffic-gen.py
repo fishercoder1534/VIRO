@@ -78,6 +78,21 @@ if __name__ == "__main__":
 	of data packets. Any one can give me any help please?
 	'''
 
+    '''
+    RJZ: I see you are right, the fields are already added. What we need to do in traffic_gen.py is to modify
+    the initial value of these fields.
+
+    fwd_vid: See page 3, letter b), letter i) on the warmup document. We will initialize this value to 
+    the gateway which is selected by the src node. However, this gateway is not known by the traffic-gen
+    device. So, setting the value of fwd_vid will be the responsibility of the the router which the 
+    traffic-gen is connected to. If we set the initial value here to some know value, say 0x89abcdef, 
+    then in the routepacket method, when that router sees that the fwd_vid is 0x89abcdef, that router knows 
+    it must set the fwd_vid to the correct value. Again, see the warmup doc to see what that value should be.
+
+    ttl: We may need to reduce this value to shorten the number of hops a packet could traverse when it's 
+    stuck in an infinite loop. Let's just leave it set to 64 for now though.
+    '''
+    
         pkt = struct.pack('!HHBBH', HTYPE, PTYPE, HLEN, PLEN, 0x0000)\
             + struct.pack('!I', int(my_vid, 2))\
             + struct.pack('!I', int(dst_vid,2))\

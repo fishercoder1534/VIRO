@@ -242,12 +242,19 @@ def sendPacket(packet,nexthop):
 def routepacket(packet):
     global myvid, routingTable, vid2pid, myprintid, L
 
+    # TODO: Modify fwd_vid if we're connected to the traffic-gen
+    #       We are connected to the traffic-gen if fwd_vid is 0x89abcdef
+    #       To accomplish this, we will need to write the following methods:
+    #       getFwdVid: base this off getDest() which already is written
+    #       updateFwdVid: base this off updateDestination() which is already written
+
     # TODO: Decrement TTL
     # TODO: if TTL is 0, drop packet
-    # TODO: Either strip or ignore
     # TODO: Source must set the initial TTL
+    # RJZ: Initial TTL is set by traffic-gen.py
     # TODO: Destination must strip TTL
-    
+    # RJZ: I don't think we'll need to worry about stripping off the TTL.
+   
     # get destination from packet
     dst = getDest(packet,L)
     
