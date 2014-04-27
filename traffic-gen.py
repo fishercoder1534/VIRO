@@ -67,6 +67,7 @@ if __name__ == "__main__":
             0x0000 for data pkts, 32bit src_vid, 32bit dst_vid, 
             32bit fwd_vid (initialized to dst_vid), 8bit TTL (initialized to 64)
         '''
+        # TODO: Add FWD-VID and TTL fields
         pkt = struct.pack('!HHBBH', HTYPE, PTYPE, HLEN, PLEN, 0x0000)\
             + struct.pack('!I', int(my_vid, 2))\
             + struct.pack('!I', int(dst_vid,2))\

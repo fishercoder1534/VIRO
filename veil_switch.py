@@ -286,7 +286,6 @@ def routepacket(packet):
             break
             
         if dist in routingTable:
-            #RJZ: Added default check
             nexthop = bin2str(routingTable[dist][0][0],L)
             nexthop = vid2pid[nexthop]
             break
