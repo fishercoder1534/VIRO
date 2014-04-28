@@ -76,9 +76,7 @@ if __name__ == "__main__":
 	else are we supposed to do? Where and how should we modify packet definition to add these two new fields?
 	I've searched through veil.py and veil_switch.py but all packets in those files are CONTROL packets instead
 	of data packets. Any one can give me any help please?
-	'''
 
-    '''
     RJZ: I see you are right, the fields are already added. What we need to do in traffic_gen.py is to modify
     the initial value of these fields.
 
@@ -92,14 +90,15 @@ if __name__ == "__main__":
     ttl: We may need to reduce this value to shorten the number of hops a packet could traverse when it's 
     stuck in an infinite loop. Let's just leave it set to 64 for now though.
     '''
-    
+
         pkt = struct.pack('!HHBBH', HTYPE, PTYPE, HLEN, PLEN, 0x0000)\
             + struct.pack('!I', int(my_vid, 2))\
             + struct.pack('!I', int(dst_vid,2))\
-            + struct.pack('!I', int(dst_vid,2))\
+            + struct.pack('!I', 0x89abcdef)\
             + struct.pack('!B', 64)\
             + struct.pack('!BHI', 0x00, 0x0000, 0x00000000)
         threading.Thread(\
             target = gen_traffic, name = 'GenTrafficTo:%s'%dst_vid,\
             args = [my_ip_pt, pkt, rates[dst_vid]]\
         ).start()
+    

@@ -246,6 +246,12 @@ not sure if they should be placed here or in veil.py.
 Also, I was wondering in updateFwdVid function, I didn't
 specify TTL field, should we add it here?
 '''
+
+'''
+RJZ: Let's move these to veil.py. And let's create two
+new methods getTTL and updateTTL.
+'''
+
 def getFwdVid(packet, L):
     t = struct.unpack("!I", packet[16:20])
     FwdVid = bin2str(t[0],L)
@@ -266,6 +272,9 @@ be set as its level-k gateway in phase I and after reaching the gateway, reset
 the FwdVid as the final dest, so how can we get the correct gateway vid? Sorry for begging help again. I was really confused here.
 '''
 
+'''
+RJZ: I took a stab at it below:
+'''
 
 def routepacket(packet):
     global myvid, routingTable, vid2pid, myprintid, L
@@ -325,6 +334,17 @@ def routepacket(packet):
         if dist in routingTable:
             nexthop = bin2str(routingTable[dist][0][0],L)
             nexthop = vid2pid[nexthop]
+
+            if packettype == 0x0:
+                fwdvid = getFwdVid(packet,L)
+                print myprintid,'FwdVid is: ', fwdvid
+                if fwdvid == 0x89abcdef:
+                    for t in routingTable[i]:
+                        gw_str = bin2str(t[1],L)
+                        gw = vid2pid[gw_str]
+                        print myprintid,'Updating FwdVid with gw: ', gw_str
+                        updateFwdVid(packet, gw)
+                        break
             break
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
@@ -433,6 +453,7 @@ topofile = sys.argv[1]
 vidfile = sys.argv[2]
 myport = int((sys.argv[3].split(":"))[1])
 mypid = sys.argv[3]
+print 'myport ', myport, 'mypid ', mypid
 
 
 # Learn my neighbors by reading the input adjacency list file
