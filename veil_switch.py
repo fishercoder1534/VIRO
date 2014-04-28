@@ -245,25 +245,14 @@ Steve: I've written these two functions here, but I'm
 not sure if they should be placed here or in veil.py.
 Also, I was wondering in updateFwdVid function, I didn't
 specify TTL field, should we add it here?
+
+Steve: I've moved them into veil.py already. Thanks Rob.
 '''
 
 '''
 RJZ: Let's move these to veil.py. And let's create two
 new methods getTTL and updateTTL.
 '''
-
-def getFwdVid(packet, L):
-    t = struct.unpack("!I", packet[16:20])
-    FwdVid = bin2str(t[0],L)
-    return FwdVid
-
-def updateFwdVid(packet, FwdVid):
-    header = packet[:8]
-    sender = packet[8:12]
-    dest = packet[12:16]
-    FwdVid = packet[16:20]
-    payload = packet[20:]
-    return (header+sender+dest+FwdVid+payload)
 
 '''
 Thank you a lot Rob for giving me these very useful hints:

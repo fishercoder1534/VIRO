@@ -4,6 +4,24 @@ import socket, struct,sys,random
 # Local imports 
 from constants import * # for the constants.
 
+'''
+Steve: So I've written the two functions here.
+'''
+# get the forwarding directive from the packet
+def getFwdVid(packet, L):
+    t = struct.unpack("!I", packet[16:20])
+    FwdVid = bin2str(t[0],L)
+    return FwdVid
+
+# update the forwarding directive in the packet
+def updateFwdVid(packet, FwdVid):
+    header = packet[:8]
+    sender = packet[8:12]
+    dest = packet[12:16]
+    FwdVid = packet[12:20]
+    payload = packet[20:]
+    return (header+sender+dest+FwdVid+payload)
+
 
 # convert a string containing mac address into a byte array
 def getMacArray(mac):
