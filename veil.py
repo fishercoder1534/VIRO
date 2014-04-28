@@ -18,9 +18,33 @@ def updateFwdVid(packet, FwdVid):
     header = packet[:8]
     sender = packet[8:12]
     dest = packet[12:16]
-    FwdVid = packet[12:20]
+    FwdVid = packet[16:20]
     payload = packet[20:]
     return (header+sender+dest+FwdVid+payload)
+
+
+'''
+Steve: I'm adding two functions regarding TTL here:
+'''
+
+# get the TTL 
+def getTTL(packet,L):
+    t = struct.unpack("!B", packet[20:21])
+    TTL = bin2str(t[0],L)
+    return TTL
+
+# update the TTL
+def updateTTL(packet,TTL):
+    header = packet[:8]
+    sender = packet[8:12]
+    dest = packet[12:16]
+    FwdVid = packet[16:20]
+    TTL = packet[20:21]
+    payload = packet[24:] #one question here: based on the figure 3 of
+# the assignment, payload starts a new line and leaving the rest of TTL
+# blank, so I simply left packet[21:24] blank there as well. We'll see
+# if this can work. - Steve
+    return (header+sender+dest+FwdVid+TTL+payload)
 
 
 # convert a string containing mac address into a byte array
