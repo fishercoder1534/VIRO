@@ -40,10 +40,7 @@ def updateTTL(packet,TTL):
     dest = packet[12:16]
     FwdVid = packet[16:20]
     TTL = packet[20:21] # This is undoing your update
-    payload = packet[21:] #one question here: based on the figure 3 of
-# the assignment, payload starts a new line and leaving the rest of TTL
-# blank, so I simply left packet[21:24] blank there as well. We'll see
-# if this can work. - Steve
+    payload = packet[21:] #Asked the TA, the payload should start right after where TTL ends. - Steve
     return (header+sender+dest+FwdVid+TTL+payload)
 
 
