@@ -88,6 +88,9 @@ def findAGW(rdvStore,k,svid):
 #######################################
 #    PROCESSPACKET FUNCTION
 #######################################
+# As Arvind suggests: processPacket function is only called by destination node
+# so when it's called, and went through all the control packets condition, then
+# it must be the DATA packet, so we modify the print message.
 def processPacket(packet):
     dst = getDest(packet,L)
     
@@ -197,7 +200,7 @@ def processPacket(packet):
             routingTable[k].append(bucket_info)
 
     else:
-        print myprintid, 'Unexpected Packet!!'
+        print myprintid, 'I am the destination and I got the data packet I wanted.'
         
 ###############################################
 #    SPROCESSPACKET FUNCTION ENDS HERE
@@ -320,6 +323,9 @@ def routepacket(packet):
     
     # TODO: Choose path based on forwarding directive to support multi-path
     #       routing
+    #       So here we just need to implement the multi-path routing based on
+    #       FwdVid: match one's own vid to FwdVid, if it matches, then reset
+    #       it with the dest vid, if not, try to find the nexthop.
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
     #       if so, send to that node
