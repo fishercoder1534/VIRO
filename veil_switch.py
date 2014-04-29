@@ -442,7 +442,6 @@ topofile = sys.argv[1]
 vidfile = sys.argv[2]
 myport = int((sys.argv[3].split(":"))[1])
 mypid = sys.argv[3]
-print 'myport ', myport, 'mypid ', mypid
 
 
 # Learn my neighbors by reading the input adjacency list file
