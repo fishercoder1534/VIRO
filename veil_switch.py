@@ -24,6 +24,20 @@ def serverThread(server_socket):
         printPacket(packet,L)
         processPacket(packet)
         client_socket.close()
+        
+#updated: define a thread to let the switch down according to input parameter
+
+def downThread():
+    global Up
+    time.sleep(int(sys.argv[4]))
+    Up = False
+
+def queryThread():
+    while (1):
+        time.sleep(30)
+        for i in range(0,L):
+            flag[i-1] = 0
+            
 ###############################################
 #    Server THREAD FUNCTION ENDS HERE
 ###############################################
@@ -421,15 +435,16 @@ def runARound(round):
 #    RunARound FUNCTION ENDS HERE
 ###############################################
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 5:
     print '-----------------------------------------------'
     print 'Wrong number of input parameters'
-    print 'Usage: ', sys.argv[0], ' <TopologyFile>', '<vid_file>', '<my_ip:my_port>'
+    print 'Usage: ', sys.argv[0], ' <TopologyFile>', '<vid_file>', '<my_ip:my_port>', '<failure_time>'
     print 'A node will have two identifiers'
     print 'i) pid: in this project pid is mapped to IP:Port of the host so if a veil_switch is running at flute.cs.umn.edu at port 5211 than pid of this switch is = flute.cs.umn.edu:5211'
     print 'ii) vid: It is the virtual id of the switch.'
     print 'TopologyFile: It contains the adjacency list using the pids. So each line contains more than one pid(s), it is interepreted as physical neighbors of the first pid.'
     print 'vid_file: It contains the pid to vid mapping, each line here contains a two tuples (space separated) first tuple is the pid and second tuple is the corresponding vid'
+    print 'failure_time: enter 0 to disable and some other integer to set timer to fail the node'
     print '-----------------------------------------------\n\n\n'
     sys.exit(0)
 
@@ -442,6 +457,7 @@ topofile = sys.argv[1]
 vidfile = sys.argv[2]
 myport = int((sys.argv[3].split(":"))[1])
 mypid = sys.argv[3]
+Up = True
 
 
 # Learn my neighbors by reading the input adjacency list file
@@ -514,7 +530,14 @@ print myprintid, ' is now listening at port: ',myport
 
 # create a server thread to take care of incoming messages:
 server = Thread(target=serverThread,args=([server_socket]))
+server.setDaemon(True)
 server.start()
+
+# Simulate node failure time
+if sys.argv[4] != '0':
+    t = Thread(target=downThread)
+    t.setDaemon(True)
+    t.start()
 
 round = 1
 
@@ -538,7 +561,7 @@ for vid in vid2pid: # iterate for every vid in vid2pid list
     if not isDuplicateBucket(routingTable[dist], bucket_info):
         routingTable[dist].append(bucket_info) # add bucket_into to routingTable[dist]
         
-while True:
+while Up:
     print myprintid, 'Starting Round #',round
     runARound(round)
     round = round + 1
@@ -553,5 +576,9 @@ while True:
             print 'Bucket #',i,'  --- E M P T Y --- '
     print 'RDV STORE: ', rdvStore
     print '\n --  --  --  --  -- --  --  --  --  -- --  --  --  --  -- \n'
-    sys.stdout.flush()
-    time.sleep(ROUND_TIME) 
+    if Up == True:
+        time.sleep(ROUND_TIME)
+
+
+print "VEIL_SWITCH: ["+mypid+'|'+myvid+'] has been terminated!'
+
