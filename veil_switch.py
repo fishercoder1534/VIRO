@@ -576,6 +576,7 @@ while Up:
             print 'Bucket #',i,'  --- E M P T Y --- '
     print 'RDV STORE: ', rdvStore
     print '\n --  --  --  --  -- --  --  --  --  -- --  --  --  --  -- \n'
+    sys.stdout.flush()
     if Up == True:
         time.sleep(ROUND_TIME)
 
