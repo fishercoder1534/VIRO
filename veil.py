@@ -18,7 +18,7 @@ def updateFwdVid(packet, FwdVid):
     header = packet[:8]
     sender = packet[8:12]
     dest = packet[12:16]
-    FwdVid = packet[16:20]
+    FwdVid = packet[16:20] # This is undoing your update
     payload = packet[20:]
     return (header+sender+dest+FwdVid+payload)
 
@@ -29,7 +29,7 @@ Steve: I'm adding two functions regarding TTL here:
 
 # get the TTL 
 def getTTL(packet,L):
-    t = struct.unpack("!B", packet[20:21])
+    t = struct.unpack("!B", packet[20])
     TTL = bin2str(t[0],L)
     return TTL
 
@@ -39,7 +39,7 @@ def updateTTL(packet,TTL):
     sender = packet[8:12]
     dest = packet[12:16]
     FwdVid = packet[16:20]
-    TTL = packet[20:21]
+    TTL = packet[20] # This is undoing your update
     payload = packet[24:] #one question here: based on the figure 3 of
 # the assignment, payload starts a new line and leaving the rest of TTL
 # blank, so I simply left packet[21:24] blank there as well. We'll see
@@ -389,7 +389,7 @@ def updateDestination(packet,dst):
     newdest = struct.pack("!I",int(dst,2))
     return (header+sender+newdest+payload)   
         
-        
+
 # returns the destination in the string format
 def getDest(packet,L):
     t = struct.unpack("!I", packet[12:16])

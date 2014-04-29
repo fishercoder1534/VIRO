@@ -54,7 +54,7 @@ def gen_traffic(my_ip_pt, pkt, rate):
             conn.send(pkt)
             conn.close() # one-shot, non-persistent for simplicity
         except:
-            print "Failed to send packets to", my_ip, my_pt
+            print "Failed to send packets to", my_ip_pt
             sys.exit(1)
 
 if __name__ == "__main__":
@@ -66,10 +66,7 @@ if __name__ == "__main__":
         note: B:8bit, H:16bit, I:32bit. reference: http://docs.python.org/library/struct.html
             0x0000 for data pkts, 32bit src_vid, 32bit dst_vid, 
             32bit fwd_vid (initialized to dst_vid), 8bit TTL (initialized to 64)
-        '''
-        # TODO: Add FWD-VID and TTL fields
-	
-	'''
+
 	Steve: So, I was going to do task 2 but got stuck here:as the assignment says, part 1 of task 2 is to add 
 	FWD-VID and TTL fields into the data packet format, but here, in this initial given code, both FWD-VID and TTL 
 	field had been given and initialized, FWD-VID had been initialized to dst_vid and TTL had been initialized to 64, so what

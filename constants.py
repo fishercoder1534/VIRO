@@ -1,6 +1,8 @@
 #########################################
 #    GLOBAL VARIABLES
 #########################################
+#RJZ: Constant to use for data packets
+DATA_PKT = 0x0
 
 # NEW OPERATIONS
 RDV_PUBLISH = 0x1000

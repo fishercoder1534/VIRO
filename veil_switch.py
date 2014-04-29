@@ -261,21 +261,15 @@ Also, I was wondering in updateFwdVid function, I didn't
 specify TTL field, should we add it here?
 
 Steve: I've moved them into veil.py already. Thanks Rob.
-'''
 
-'''
 RJZ: Let's move these to veil.py. And let's create two
 new methods getTTL and updateTTL.
-'''
 
-'''
 Thank you a lot Rob for giving me these very useful hints:
 I went thru warm-up exercise again today as you said, and I know FwdVid should
 be set as its level-k gateway in phase I and after reaching the gateway, reset
 the FwdVid as the final dest, so how can we get the correct gateway vid? Sorry for begging help again. I was really confused here.
-'''
 
-'''
 RJZ: I took a stab at it below:
 '''
 
@@ -288,13 +282,11 @@ def routepacket(packet):
     #       getFwdVid: base this off getDest() which already is written
     #       updateFwdVid: base this off updateDestination() which is already written
 
-    # TODO: Decrement TTL
-    # TODO: if TTL is 0, drop packet
-    # TODO: Source must set the initial TTL
+    # Source must set the initial TTL
     # RJZ: Initial TTL is set by traffic-gen.py
-    # TODO: Destination must strip TTL
-    # RJZ: I don't think we'll need to worry about stripping off the TTL.
-   
+    # Destination must strip TTL
+    # RJZ: I don't think we'll need to worry about stripping off the TTL
+
     # get destination from packet
     dst = getDest(packet,L)
     
@@ -312,6 +304,19 @@ def routepacket(packet):
     #Find the next hop
     nexthop = ''
     packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
+
+    # RJZ: Decrement TTL
+    if packettype == DATA_PKT:
+        ttl_orig = getTTL(packet,L)
+        ttl = int(ttl_orig,2) - 1
+
+        # RJZ: if TTL is 0, drop packet
+        if ttl <= 0:
+            print myprintid, 'Dropped packet due to TTL expiration!'
+            return;
+        else:
+            print myprintid, 'Updated TTL for vid', myvid, 'from', int(ttl_orig,2), 'to', ttl
+            updateTTL(packet, bin(ttl))
     
     # TODO: Choose path based on forwarding directive to support multi-path
     #       routing
@@ -335,18 +340,23 @@ def routepacket(packet):
             break
             
         if dist in routingTable:
-            nexthop = bin2str(routingTable[dist][0][0],L)
-            nexthop = vid2pid[nexthop]
+            for t in routingTable[dist]:
+                nexthop = bin2str(t[0],L)
+                nexthop = vid2pid[nexthop]
 
-            if packettype == 0x0:
-                fwdvid = getFwdVid(packet,L)
-                print myprintid,'FwdVid is: ', fwdvid
+            if packettype == DATA_PKT:
+                fwdvid = int(getFwdVid(packet,L), 2)
+                print myprintid,'FwdVid is:', hex(fwdvid)
                 if fwdvid == 0x89abcdef:
-                    for t in routingTable[i]:
-                        gw_str = bin2str(t[1],L)
-                        gw = vid2pid[gw_str]
-                        print myprintid,'Updating FwdVid with gw: ', gw_str
-                        updateFwdVid(packet, gw)
+                    print myprintid,'I am a source router!'
+                    for t in routingTable[dist]:
+                        print myprintid,'Getting gw for level', dist
+                        gw = bin2str(t[1],L)
+                        if gw == '':
+                            print myprintid,'No gw known for this packet!'
+                        else:
+                            print myprintid,'Updating FwdVid with gw:', gw
+                            updateFwdVid(packet, gw)
                         break
             break
             
@@ -372,6 +382,8 @@ def routepacket(packet):
         printPacket(packet,L)
         return
     
+    print myprintid, 'Sending packet to', nexthop
+    printPacket(packet,L)
     sendPacket(packet,nexthop)
 
 ###############################################
@@ -524,7 +536,7 @@ myprintid = "VEIL_SWITCH: ["+mypid+'|'+myvid+']'
 
 # Now start my serversocket to listen to the incoming packets         
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(("", myport))
+server_socket.bind(('', myport))
 server_socket.listen(5)
 print myprintid, ' is now listening at port: ',myport
 
