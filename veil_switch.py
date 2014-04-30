@@ -328,15 +328,33 @@ def routepacket(packet):
     #       So here we just need to implement the multi-path routing based on
     #       FwdVid: match one's own vid to FwdVid, if it matches, then reset
     #       it with the dest vid, if not, try to find the nexthop.
+    #Steve: I'll take a stab here, it's not complete, please feel free to modify it or give me hints:
+            fwdvid = getFwdVid(packet,fwdvid)
+            if myvid == fwdvid:
+           	packet = updateFwdVid(packet,dst)
+            else:  
+                getNexthop(dst)		
+
+
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
     #       if so, send to that node
     #       if not, we update the routing table: remove this record from table
     #         *Use routingTable.remove()*
     #         after this, we look for the next nexthop
+    #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
+            	createEchoRequestPacket(myvid,nextHop)
+		if echoReply == True:
+		    sendPacket(packet,nextHop)
+		else:
+		    # I searched through veil.py and veil_switch.py and constants.py also but I didn't find this
+ 		    # routingTable.remove() function, any more help?
+		    getNexthop(dst)		    
+
     # TODO: Question: what happens if we run out of nexthops?
     #       notify source? drop packet?
-    #       Steve: based on what I learned from the TA, we'll just drop the packet if we run out of nexthops.
+    #       Steve: based on what I learned from the TA, we'll just drop the packet if we run out of nexthops. 
+
     while nexthop == '':
         if dst in vid2pid:
             nexthop = vid2pid[dst]
