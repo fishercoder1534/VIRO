@@ -332,24 +332,28 @@ def routepacket(packet):
             fwdvid = getFwdVid(packet,fwdvid)
             if myvid == fwdvid:
            	packet = updateFwdVid(packet,dst)
+		sendPacket(packet,dst)       		
             else:  
-                getNexthop(dst)		
+                nexthop =  getNexthop(dst)		
 
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
+    # 	    Steve: So, here I've just asked the TA, he gave me a simpler way to do it: because if we use createEchoRequestPacket function, then we'll have to wait for an acknowledgement back if that's a working nexthop, this is complex, so instead of calling these given functions, we could simply use "ping" to check if nexthop is working or not.
+
     #       if so, send to that node
     #       if not, we update the routing table: remove this record from table
-    #         *Use routingTable.remove()*
+    #         *Use routingTable.remove()* 
+    #	     Steve: this .remove() is a built-in function that python has, routingTable is a data structure that gets initialized in main function in this program, we can simply call this .remove() function on this data structure.
     #         after this, we look for the next nexthop
     #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
-            	createEchoRequestPacket(myvid,nextHop)
+            	echoReply = createEchoRequestPacket(myvid,nextHop)
 		if echoReply == True:
 		    sendPacket(packet,nextHop)
 		else:
 		    # I searched through veil.py and veil_switch.py and constants.py also but I didn't find this
  		    # routingTable.remove() function, any more help?
-		    getNexthop(dst)		    
+                    nexthop = getNexthop(dst)		    
 
     # TODO: Question: what happens if we run out of nexthops?
     #       notify source? drop packet?
@@ -421,7 +425,8 @@ def routepacket(packet):
 ###############################################
 
 def publish(bucket,k):
-    global myvid
+    global myvid, publishCounter
+    publishCounter++
     dst = getRendezvousID(k,myvid)
     packet = createRDV_PUBLISH(bucket,myvid,dst)
     print myprintid, 'Publishing my neighbor', bin2str(bucket[0],L), 'to rdv:',dst
@@ -437,7 +442,8 @@ def publish(bucket,k):
 ###############################################
 
 def query(k):
-    global myvid
+    global myvid, queryCounter
+    queryCounter++
     dst = getRendezvousID(k,myvid)
     packet = createRDV_QUERY(k,myvid,dst)
     print myprintid, 'Quering to reach Bucket:',k, 'to rdv:',dst
@@ -508,6 +514,8 @@ routingTable = {}
 rdvStore = {} 
 myprintid = ''
 L = 0
+queryCounter = 0
+publishCounter = 0
 # Routing table is a dictionary, it contains the values at each distances from 1 to L
 # So key in the routing table is the bucket distance, value is the 3 tuple: tuple 1 = nexthop (vid), tuple 2 = gateway (vid), tuple 3 = prefix (string)
 
@@ -608,7 +616,7 @@ while Up:
         round = L
     print '\n\t----> Routing Table at :',myvid,'|',mypid,' <----'
     for i in range(1,L+1):
-        if i in routingTable:
+        if i in routingTable:# for each router,there might be multiple entries, that's why we're having two for loops here
             for j in routingTable[i]:
                 print 'Bucket #', i, 'Nexthop:',bin2str(j[0],L), 'Gateway:',bin2str(j[1],L), 'Prefix:',j[2], 'Default:', j[3]
         else:
