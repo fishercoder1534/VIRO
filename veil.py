@@ -18,9 +18,9 @@ def updateFwdVid(packet, FwdVid):
     header = packet[:8]
     sender = packet[8:12]
     dest = packet[12:16]
-    FwdVid = packet[16:20] # This is undoing your update
+    t = struct.pack("!I", FwdVid)
     payload = packet[20:]
-    return (header+sender+dest+FwdVid+payload)
+    return (header+sender+dest+t+payload)
 
 
 '''
@@ -39,9 +39,9 @@ def updateTTL(packet,TTL):
     sender = packet[8:12]
     dest = packet[12:16]
     FwdVid = packet[16:20]
-    TTL = packet[20:21] # This is undoing your update
+    t = struct.pack("!B", TTL)
     payload = packet[21:] #Asked the TA, the payload should start right after where TTL ends. - Steve
-    return (header+sender+dest+FwdVid+TTL+payload)
+    return (header+sender+dest+FwdVid+t+payload)
 
 
 # convert a string containing mac address into a byte array

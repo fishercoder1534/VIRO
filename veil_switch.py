@@ -319,9 +319,10 @@ def routepacket(packet):
             print myprintid, 'Dropped packet due to TTL expiration!'
             return;
         else:
-            print myprintid, 'Updated TTL for vid', myvid, 'from', int(ttl_orig,2), 'to', ttl
-            updateTTL(packet, bin(ttl))
-    
+            print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
+            packet = updateTTL(packet, ttl)
+            ttl_orig = getTTL(packet,L)
+
     # TODO: Choose path based on forwarding directive to support multi-path
     #       routing
     #       So here we just need to implement the multi-path routing based on
@@ -364,7 +365,7 @@ def routepacket(packet):
                             print myprintid,'No gw known for this packet!'
                         else:
                             print myprintid,'Updating FwdVid with gw:', gw
-                            updateFwdVid(packet, gw)
+                            packet = updateFwdVid(packet, int(gw))
                         break
             break
             
@@ -378,7 +379,7 @@ def routepacket(packet):
     #print 'MyVID: ', myvid, 'DEST: ', dst
     if dst != getDest(packet,L):
         # update the destination on the packet
-        updateDestination(packet,dst)
+        packet = updateDestination(packet,dst)
         
     if dst == myvid:
         #print "I am the destination for this RDV Q/P message:"
