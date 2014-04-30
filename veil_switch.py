@@ -323,18 +323,6 @@ def routepacket(packet):
             packet = updateTTL(packet, ttl)
             ttl_orig = getTTL(packet,L)
 
-    # TODO: Choose path based on forwarding directive to support multi-path
-    #       routing
-    #       So here we just need to implement the multi-path routing based on
-    #       FwdVid: match one's own vid to FwdVid, if it matches, then reset
-    #       it with the dest vid, if not, try to find the nexthop.
-    #Steve: I'll take a stab here, it's not complete, please feel free to modify it or give me hints:
-            fwdvid = getFwdVid(packet,fwdvid)
-            if myvid == fwdvid:
-           	packet = updateFwdVid(packet,dst)
-            else:  
-                getNexthop(dst)		
-
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
@@ -359,7 +347,7 @@ def routepacket(packet):
         if dst in vid2pid:
             nexthop = vid2pid[dst]
             break
-        
+
         # Calculate logical distance with destination    
         dist = delta(myvid,dst)
         
@@ -385,6 +373,31 @@ def routepacket(packet):
                             print myprintid,'Updating FwdVid with gw:', gw
                             packet = updateFwdVid(packet, int(gw))
                         break
+
+                # RJZ: Moved this chunk of code to the location where we're
+                #      actually determining the nexthop
+                # TODO: Choose path based on forwarding directive to support 
+                #       multi-path routing
+                #       So here we just need to implement the multi-path routing
+                #       based on FwdVid: match one's own vid to FwdVid, if it 
+                #       matches, then reset it with the dest vid, if not, try 
+                #       to find the nexthop.
+                #Steve: I'll take a stab here, it's not complete, please feel 
+                #       free to modify it or give me hints:
+                #RJZ: I think your implementation is good. One thing below
+                #     though. If we're in the "up the tree" phase, we choose the
+                #     nexthop based off the FwdVid. If we're in the "down the 
+                #     tree" phase, then we choose based on the dst.
+                fwdvid = getFwdVid(packet,fwdvid)
+                if myvid == fwdvid:
+                    packet = updateFwdVid(packet,dst)
+                else:  
+                    if dst != fwdvid: # up the tree
+                        print myprintid,'Going up the tree'
+                        nexthop = getNexthop(fwdvid)
+                    else: #down the tree
+                        print myprintid,'Going down the tree'
+                        nexthop = getNexthop(dst)
             break
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
