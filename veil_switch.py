@@ -88,7 +88,8 @@ def findAGW(rdvStore,k,svid):
 #######################################
 #    PROCESSPACKET FUNCTION
 #######################################
-# As Arvind suggests: processPacket function is only called by destination node
+# As Arvind suggests: the last branch of processPacket function
+# is only called by destination node,
 # so when it's called, and went through all the control packets condition, then
 # it must be the DATA packet, so we modify the print message.
 def processPacket(packet):
@@ -334,6 +335,7 @@ def routepacket(packet):
     #         after this, we look for the next nexthop
     # TODO: Question: what happens if we run out of nexthops?
     #       notify source? drop packet?
+    #       Steve: based on what I learned from the TA, we'll just drop the packet if we run out of nexthops.
     while nexthop == '':
         if dst in vid2pid:
             nexthop = vid2pid[dst]
