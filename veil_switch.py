@@ -381,10 +381,10 @@ def routepacket(packet):
                 else:  
                     if dst != fwdvid: # up the tree
                         print myprintid,'Going up the tree'
-                        nexthop = getNexthop(fwdvid)
+                       # nexthop = getNexthop(fwdvid)  # I just realized that getNexthop was not given, so if we need to use this function, we'll have to implement it ourselves.
                     else: #down the tree
                         print myprintid,'Going down the tree'
-                        nexthop = getNexthop(dst)
+                       # nexthop = getNexthop(dst)
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
@@ -399,10 +399,10 @@ def routepacket(packet):
     #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
                 echoReply = True;
                 while echoReply:
-                    echoReply = ping(nextHop)
+                   # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
                     if echoReply == False:
                         routingTable[dst].remove()
-                        nexthop = getNexthop(dst)
+                       # nexthop = getNexthop(dst)
                         if nexthop == '':
                             print myprintid, 'No remaining nexthop choices!'
                             break
