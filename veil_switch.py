@@ -301,6 +301,8 @@ def routepacket(packet):
         return
     
     #If destination is one of my physical neighbor
+    #Chris: if the link between this node and destination is down, what should do next? I think we should put this code
+    #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet
     if dst in vid2pid:
         sendPacket(packet,vid2pid[dst])
         return
@@ -346,6 +348,8 @@ def routepacket(packet):
                 nexthop = bin2str(t[0],L)
                 nexthop = vid2pid[nexthop]
 
+            #Chris: I think the code marked below should be in the for block
+            #Chris: -------------------------code start here-----------------------------------
             if packettype == DATA_PKT:
                 fwdvid = int(getFwdVid(packet,L), 2)
                 print myprintid,'FwdVid is:', hex(fwdvid)
@@ -398,16 +402,18 @@ def routepacket(packet):
     #         after this, we look for the next nexthop
     #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
     #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
-                echoReply = True;
-                while echoReply:
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
-                    if echoReply == False:
-                        routingTable[dst].remove()
-                       # nexthop = getNexthop(dst)
-                        if nexthop == '':
-                            print myprintid, 'No remaining nexthop choices!'
-                            break
-            break
+                   #using socket connect to test whether the remote host is still working
+                    try:
+                        testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        address = nexthop.split(':')
+                        testSocket.connect(address[0], address[1])
+                        testSocket.close()
+                        print "The next hop:", nexthop, "is up"
+                        break
+                    except:
+                        print "The next hop:", nexthop, "is down"
+              #Chris:-----------------------------------------Code ends here--------------------------------------------
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
             break 
