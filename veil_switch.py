@@ -259,21 +259,6 @@ def sendPacket(packet,nexthop):
 
 
 '''
-Steve: I've written these two functions here, but I'm
-not sure if they should be placed here or in veil.py.
-Also, I was wondering in updateFwdVid function, I didn't
-specify TTL field, should we add it here?
-
-Steve: I've moved them into veil.py already. Thanks Rob.
-
-RJZ: Let's move these to veil.py. And let's create two
-new methods getTTL and updateTTL.
-
-Thank you a lot Rob for giving me these very useful hints:
-I went thru warm-up exercise again today as you said, and I know FwdVid should
-be set as its level-k gateway in phase I and after reaching the gateway, reset
-the FwdVid as the final dest, so how can we get the correct gateway vid? Sorry for begging help again. I was really confused here.
-
 RJZ: I took a stab at it below:
 '''
 
@@ -282,9 +267,6 @@ def routepacket(packet):
 
     # TODO: Modify fwd_vid if we're connected to the traffic-gen
     #       We are connected to the traffic-gen if fwd_vid is 0x89abcdef
-    #       To accomplish this, we will need to write the following methods:
-    #       getFwdVid: base this off getDest() which already is written
-    #       updateFwdVid: base this off updateDestination() which is already written
 
     # Source must set the initial TTL
     # RJZ: Initial TTL is set by traffic-gen.py
@@ -302,7 +284,8 @@ def routepacket(packet):
     
     #If destination is one of my physical neighbor
     #Chris: if the link between this node and destination is down, what should do next? I think we should put this code
-    #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet
+    #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet 
+    #Steve: To answer Chris's question: as Arvind stated explicitly in README file, we don't need to consider link failure, instead we just consider node failure, so we don't need to worry about this.
     if dst in vid2pid:
         sendPacket(packet,vid2pid[dst])
         return
@@ -396,11 +379,7 @@ def routepacket(packet):
     #       if so, send to that node
     #       if not, we update the routing table: remove this record from table
     #         *Use routingTable.remove()* 
-    # I searched through veil.py and veil_switch.py and constants.py also but I 
-    # didn't find this routingTable.remove() function, any more help?
-    #	     Steve: this .remove() is a built-in function that python has, routingTable is a data structure that gets initialized in main function in this program, we can simply call this .remove() function on this data structure.
-    #         after this, we look for the next nexthop
-    #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
+ 
     #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
                    #using socket connect to test whether the remote host is still working
