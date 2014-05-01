@@ -444,6 +444,7 @@ def routepacket(packet):
 def publish(bucket,k):
     global myvid, publishCounter
     publishCounter += 1
+    print 'publishCounter = ', publishCounter
     dst = getRendezvousID(k,myvid)
     packet = createRDV_PUBLISH(bucket,myvid,dst)
     print myprintid, 'Publishing my neighbor', bin2str(bucket[0],L), 'to rdv:',dst
@@ -461,6 +462,7 @@ def publish(bucket,k):
 def query(k):
     global myvid, queryCounter
     queryCounter += 1
+    print 'queryCounter = ', queryCounter   
     dst = getRendezvousID(k,myvid)
     packet = createRDV_QUERY(k,myvid,dst)
     print myprintid, 'Quering to reach Bucket:',k, 'to rdv:',dst
