@@ -397,6 +397,7 @@ def routepacket(packet):
     #	     Steve: this .remove() is a built-in function that python has, routingTable is a data structure that gets initialized in main function in this program, we can simply call this .remove() function on this data structure.
     #         after this, we look for the next nexthop
     #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
+    #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in z
                 echoReply = True;
                 while echoReply:
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
