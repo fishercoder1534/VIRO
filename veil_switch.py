@@ -323,27 +323,12 @@ def routepacket(packet):
             packet = updateTTL(packet, ttl)
             ttl_orig = getTTL(packet,L)
 
-    # TODO: After we find the nexthop, we test to see if that node is functional
-    #       *Use createEchoRequestPacket for this*
-    # 	    Steve: So, here I've just asked the TA, he gave me a simpler way to do it: because if we use createEchoRequestPacket function, then we'll have to wait for an acknowledgement back if that's a working nexthop, this is complex, so instead of calling these given functions, we could simply use "ping" to check if nexthop is working or not.
-
-    #       if so, send to that node
-    #       if not, we update the routing table: remove this record from table
-    #         *Use routingTable.remove()* 
-    #	     Steve: this .remove() is a built-in function that python has, routingTable is a data structure that gets initialized in main function in this program, we can simply call this .remove() function on this data structure.
-    #         after this, we look for the next nexthop
-    #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
-            	echoReply = createEchoRequestPacket(myvid,nextHop)
-		if echoReply == True:
-		    sendPacket(packet,nextHop)
-		else:
-		    # I searched through veil.py and veil_switch.py and constants.py also but I didn't find this
- 		    # routingTable.remove() function, any more help?
-                    nexthop = getNexthop(dst)		    
+        #RJZ: Moved this block below
 
     # TODO: Question: what happens if we run out of nexthops?
     #       notify source? drop packet?
-    #       Steve: based on what I learned from the TA, we'll just drop the packet if we run out of nexthops. 
+    #       Steve: based on what I learned from the TA, we'll just drop the 
+    #       packet if we run out of nexthops. 
 
     while nexthop == '':
         if dst in vid2pid:
@@ -400,6 +385,28 @@ def routepacket(packet):
                     else: #down the tree
                         print myprintid,'Going down the tree'
                         nexthop = getNexthop(dst)
+
+    # TODO: After we find the nexthop, we test to see if that node is functional
+    #       *Use createEchoRequestPacket for this*
+    # 	    Steve: So, here I've just asked the TA, he gave me a simpler way to do it: because if we use createEchoRequestPacket function, then we'll have to wait for an acknowledgement back if that's a working nexthop, this is complex, so instead of calling these given functions, we could simply use "ping" to check if nexthop is working or not.
+
+    #       if so, send to that node
+    #       if not, we update the routing table: remove this record from table
+    #         *Use routingTable.remove()* 
+    # I searched through veil.py and veil_switch.py and constants.py also but I 
+    # didn't find this routingTable.remove() function, any more help?
+    #	     Steve: this .remove() is a built-in function that python has, routingTable is a data structure that gets initialized in main function in this program, we can simply call this .remove() function on this data structure.
+    #         after this, we look for the next nexthop
+    #Steve: I also gave it a shot here, feel free to revise it if you see necessary:
+                echoReply = True;
+                while echoReply:
+                    echoReply = ping(nextHop)
+                    if echoReply == False:
+                        routingTable[dst].remove()
+                        nexthop = getNexthop(dst)
+                        if nexthop == '':
+                            print myprintid, 'No remaining nexthop choices!'
+                            break
             break
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
