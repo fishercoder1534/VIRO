@@ -1,0 +1,21 @@
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5001 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5002 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5003 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5004 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5005 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5006 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5007 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5008 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5009 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5010 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5011 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5012 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5013 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5014 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5015 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5016 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5017 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5018 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5019 0 &
+python ../../../veil_switch.pyc 20.adlist 20.vid localhost:5020 0 & 
+
