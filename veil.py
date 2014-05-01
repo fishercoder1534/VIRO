@@ -385,7 +385,33 @@ def updateDestination(packet,dst):
     payload = packet[16:]
     newdest = struct.pack("!I",int(dst,2))
     return (header+sender+newdest+payload)   
-        
+    
+# getNexthop (abstracted this function out based on the code in routepacket function, per the TA said, then we can reuse this function easily)
+def getNexthop(packet):
+    while nexthop == '':
+    	if dst in vid2pid:
+	    nexthop = vid2pid[dst]
+	    break
+
+	# Calculate logical distance with destination
+	dist = delta(myvid,dst)
+   	
+   	if dist == 0:
+	    break
+
+	if dist in routingTable:
+	    nexthop = bin2str(routingTable[dist][0][0],L)
+	    nexthop = vid2pid[nexthop]
+	    break
+    
+ 	if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
+	    break
+
+	print myprintid, 'No next hop for destination: ', dst, 'dist: ', dist
+	#flip the dist bit to
+	dst = flipBit(dst,dist)
+
+    
 
 # returns the destination in the string format
 def getDest(packet,L):
