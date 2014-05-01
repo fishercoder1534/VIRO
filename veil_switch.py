@@ -388,8 +388,7 @@ def routepacket(packet):
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
-    # 	    Steve: So, here I've just asked the TA, he gave me a simpler way to do it: because if we use createEchoRequestPacket function, then we'll have to wait for an acknowledgement back if that's a working nexthop, this is complex, so instead of calling these given functions, we could simply use "ping" to check if nexthop is working or not.
-
+    #Steve: so the TA just corrected his idea and I've forwarded his email to you gusy, we'll not be able to simply use "ping".
     #       if so, send to that node
     #       if not, we update the routing table: remove this record from table
     #         *Use routingTable.remove()* 
@@ -444,7 +443,7 @@ def routepacket(packet):
 
 def publish(bucket,k):
     global myvid, publishCounter
-    publishCounter++
+    publishCounter += 1
     dst = getRendezvousID(k,myvid)
     packet = createRDV_PUBLISH(bucket,myvid,dst)
     print myprintid, 'Publishing my neighbor', bin2str(bucket[0],L), 'to rdv:',dst
@@ -461,7 +460,7 @@ def publish(bucket,k):
 
 def query(k):
     global myvid, queryCounter
-    queryCounter++
+    queryCounter += 1
     dst = getRendezvousID(k,myvid)
     packet = createRDV_QUERY(k,myvid,dst)
     print myprintid, 'Quering to reach Bucket:',k, 'to rdv:',dst
