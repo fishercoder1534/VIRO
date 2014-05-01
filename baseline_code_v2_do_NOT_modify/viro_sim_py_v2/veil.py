@@ -4,45 +4,6 @@ import socket, struct,sys,random
 # Local imports 
 from constants import * # for the constants.
 
-'''
-Steve: So I've written the two functions here.
-'''
-# get the forwarding directive from the packet
-def getFwdVid(packet, L):
-    t = struct.unpack("!I", packet[16:20])
-    FwdVid = bin2str(t[0],L)
-    return FwdVid
-
-# update the forwarding directive in the packet
-def updateFwdVid(packet, FwdVid):
-    header = packet[:8]
-    sender = packet[8:12]
-    dest = packet[12:16]
-    t = struct.pack("!I", FwdVid)
-    payload = packet[20:]
-    return (header+sender+dest+t+payload)
-
-
-'''
-Steve: I'm adding two functions regarding TTL here:
-'''
-
-# get the TTL 
-def getTTL(packet,L):
-    t = struct.unpack("!B", packet[20])
-    TTL = bin2str(t[0],L)
-    return TTL
-
-# update the TTL
-def updateTTL(packet,TTL):
-    header = packet[:8]
-    sender = packet[8:12]
-    dest = packet[12:16]
-    FwdVid = packet[16:20]
-    t = struct.pack("!B", TTL)
-    payload = packet[21:] #Asked the TA, the payload should start right after where TTL ends. - Steve
-    return (header+sender+dest+FwdVid+t+payload)
-
 
 # convert a string containing mac address into a byte array
 def getMacArray(mac):
@@ -307,7 +268,7 @@ def getPrefix(vid,dist):
 def isDuplicateBucket(bucketlist,bucket):
     isduplicate = False
     for i in range(0, len(bucketlist)):
-        if bucketlist[i][0] == bucket[0] and bucketlist[i][1] == bucket[1] and bucketlist[i][2] == bucket[2] and bucketlist[i][3] == bucket[3]:
+        if bucketlist[i][0] == bucket[0] and bucketlist[i][1] == bucket[1] and bucketlist[i][2] == bucket[2]:
             isduplicate = True
             return isduplicate
     return isduplicate
@@ -337,8 +298,7 @@ def createRDV_PUBLISH(bucket,myvid,dst):
 
 # create a RDV_REPLY Pakcet
 # GW IS AN INT HERE! AND REST ARE BINARY STRINGS
-# RJZ: Accept multiple gateways as arguments here
-def createRDV_REPLY(gw0,gw1,gw2,bucket_dist,myvid, dst):
+def createRDV_REPLY(gw,bucket_dist,myvid, dst):
     # First prepare header
     packet = struct.pack("!HHBBH",HTYPE,PTYPE,HLEN,PLEN,RDV_REPLY)
     # Sender VID (32 bits)
@@ -350,8 +310,7 @@ def createRDV_REPLY(gw0,gw1,gw2,bucket_dist,myvid, dst):
     buck_dist = struct.pack("!I",bucket_dist)
     
     # Destination Subtree-k
-    z = struct.pack("!III",gw0,gw1,gw2)
-
+    z = struct.pack("!I",gw)
     return (packet+svid+dvid+buck_dist+z)    
 
 # create a RDV_QUERY Pakcet
@@ -385,34 +344,8 @@ def updateDestination(packet,dst):
     payload = packet[16:]
     newdest = struct.pack("!I",int(dst,2))
     return (header+sender+newdest+payload)   
-    
-# getNexthop (abstracted this function out based on the code in routepacket function, per the TA said, then we can reuse this function easily)
-def getNexthop(packet):
-    while nexthop == '':
-    	if dst in vid2pid:
-	    nexthop = vid2pid[dst]
-	    break
-
-	# Calculate logical distance with destination
-	dist = delta(myvid,dst)
-   	
-   	if dist == 0:
-	    break
-
-	if dist in routingTable:
-	    nexthop = bin2str(routingTable[dist][0][0],L)
-	    nexthop = vid2pid[nexthop]
-	    break
-    
- 	if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
-	    break
-
-	print myprintid, 'No next hop for destination: ', dst, 'dist: ', dist
-	#flip the dist bit to
-	dst = flipBit(dst,dist)
-
-    
-
+        
+        
 # returns the destination in the string format
 def getDest(packet,L):
     t = struct.unpack("!I", packet[12:16])
