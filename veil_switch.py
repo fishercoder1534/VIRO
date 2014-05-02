@@ -295,9 +295,9 @@ def routepacket(packet):
         return
     
     #If destination is one of my physical neighbor
-    #Chris: if the link between this node and destination is down, what should do next? I think we should put this code
+    #Chris:I think we should put this code
     #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet 
-    #Steve: To answer Chris's question: as Arvind stated explicitly in README file, we don't need to consider link failure, instead we just consider node failure, so we don't need to worry about this.
+    
     if dst in vid2pid:
         sendPacket(packet,vid2pid[dst])
         return
@@ -314,7 +314,7 @@ def routepacket(packet):
         # RJZ: if TTL is 0, drop packet
         if ttl <= 0:
             print myprintid, 'Dropped packet due to TTL expiration!'
-            return;
+            return
         else:
             print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
             packet = updateTTL(packet, ttl)
