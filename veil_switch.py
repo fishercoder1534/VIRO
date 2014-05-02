@@ -213,7 +213,7 @@ def processPacket(packet):
 def getNextHop(destvid_str):
     nexthop = ''
     print myprintid, 'Finding nexthop for', destvid_str
-    
+
     # if dest is neighbor return 
     if destvid_str in vid2pid:
         return vid2pid[destvid_str]
@@ -225,7 +225,7 @@ def getNextHop(destvid_str):
     if dist in routingTable:
         nexthop = bin2str(routingTable[dist][0][0],L)
         nexthop = vid2pid[nexthop]
-        
+
     return nexthop
     
 ###############################################
@@ -334,10 +334,12 @@ def routepacket(packet):
             #Chris: I think the code marked below should be in the for block
             #Chris: -------------------------code start here-----------------------------------
             if packettype == DATA_PKT:
-                fwdvid = int(getFwdVid(packet,L), 2)
+                fwdvid_str = getFwdVid(packet,L)
+                fwdvid = int(fwdvid_str, 2)
                 print myprintid,'FwdVid is:', hex(fwdvid)
                 if fwdvid == 0x89abcdef:
                     print myprintid,'I am a source router!'
+
                     for t in routingTable[dist]:
                         print myprintid,'Getting gw for level', dist
                         gw = bin2str(t[1],L)
@@ -345,7 +347,14 @@ def routepacket(packet):
                             print myprintid,'No gw known for this packet!'
                         else:
                             print myprintid,'Updating FwdVid with gw:', gw
-                            packet = updateFwdVid(packet, int(gw))
+                            packet = updateFwdVid(packet, int(gw,2))
+                            fwdvid_str = gw
+                            fwdvid = int(fwdvid_str, 2)
+                        break
+
+                    #RJZ: Still investigating why this is happening...
+                    if fwdvid == 0x89abcdef:
+                        print myprintid,'Route disappeared from table...'
                         break
 
                 # RJZ: Moved this chunk of code to the location where we're
@@ -362,16 +371,22 @@ def routepacket(packet):
                 #     though. If we're in the "up the tree" phase, we choose the
                 #     nexthop based off the FwdVid. If we're in the "down the 
                 #     tree" phase, then we choose based on the dst.
-                fwdvid = getFwdVid(packet,fwdvid)
-                if myvid == fwdvid:
-                    packet = updateFwdVid(packet,dst)
-                else:  
-                    if dst != fwdvid: # up the tree
-                        print myprintid,'Going up the tree'
-                       # nexthop = getNexthop(fwdvid)  # I just realized that getNexthop was not given, so if we need to use this function, we'll have to implement it ourselves.
-                    else: #down the tree
-                        print myprintid,'Going down the tree'
-                       # nexthop = getNexthop(dst)
+                if int(myvid,2) == fwdvid:
+                    packet = updateFwdVid(packet, int(dst,2))
+                    fwdvid_str = dst
+                    fwdvid = int(fwdvid_str, 2)
+
+                if int(dst,2) != fwdvid: # up the tree
+                    print myprintid,'Going up the tree'
+                    nexthop = getNextHop(fwdvid_str)
+                    # I just realized that getNexthop was not given, so if we need to use this function, we'll have to implement it ourselves.
+                    #RJZ: It is given. in this file. line 213. I commented out
+                    # your copy paste since it is not needed.
+                    # Please in the future choose more different method names
+                    # getNexthop and getNextHop are easily confused
+                else: #down the tree
+                    print myprintid,'Going down the tree'
+                    nexthop = getNextHop(dst)
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
@@ -383,15 +398,15 @@ def routepacket(packet):
     #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
                    #using socket connect to test whether the remote host is still working
-                    try:
-                        testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        address = nexthop.split(':')
-                        testSocket.connect(address[0], address[1])
-                        testSocket.close()
-                        print "The next hop:", nexthop, "is up"
-                        break
-                    except:
-                        print "The next hop:", nexthop, "is down"
+                try:
+                    testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    address = nexthop.split(':')
+                    testSocket.connect(address[0], address[1])
+                    testSocket.close()
+                    print myprintid,"The next hop:", nexthop, "is up"
+                    break
+                except:
+                    print myprintid,"The next hop:", nexthop, "is down"
               #Chris:-----------------------------------------Code ends here--------------------------------------------
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
