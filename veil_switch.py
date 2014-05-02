@@ -297,9 +297,9 @@ def routepacket(packet):
         return
     
     #If destination is one of my physical neighbor
-    #Chris: if the link between this node and destination is down, what should do next? I think we should put this code
+    #Chris:I think we should put this code
     #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet 
-    #Steve: To answer Chris's question: as Arvind stated explicitly in README file, we don't need to consider link failure, instead we just consider node failure, so we don't need to worry about this.
+    
     if dst in vid2pid:
         sendPacket(packet,vid2pid[dst])
         return
@@ -315,7 +315,7 @@ def routepacket(packet):
         # RJZ: if TTL is 0, drop packet
         if ttl <= 0:
             print myprintid, 'Dropped packet due to TTL expiration!'
-            return;
+            return
         else:
             print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
             packet = updateTTL(packet, ttl)
@@ -346,24 +346,24 @@ def routepacket(packet):
 
             #Chris: I think the code marked below should be in the for block
             #Chris: -------------------------code start here-----------------------------------
-            if packettype == DATA_PKT:
-                fwdvid_str = getFwdVid(packet,L)
-                fwdvid = int(fwdvid_str, 2)
-                print myprintid,'FwdVid is:', hex(fwdvid)
-                if fwdvid == 0x89abcdef:
-                    print myprintid,'I am a source router!'
+    	        if packettype == DATA_PKT:
+                    fwdvid_str = getFwdVid(packet,L)
+                    fwdvid = int(fwdvid_str, 2)
+                    print myprintid,'FwdVid is:', hex(fwdvid)
+                    if fwdvid == 0x89abcdef:
+                        print myprintid,'I am a source router!'
 
-                    for t in routingTable[dist]:
-                        print myprintid,'Getting gw for level', dist
-                        gw = bin2str(t[1],L)
-                        if gw == '':
-                            print myprintid,'No gw known for this packet!'
-                        else:
-                            print myprintid,'Updating FwdVid with gw:', gw
-                            packet = updateFwdVid(packet, int(gw,2))
-                            fwdvid_str = gw
-                            fwdvid = int(fwdvid_str, 2)
-                        break
+                        for t in routingTable[dist]:
+                            print myprintid,'Getting gw for level', dist
+                            gw = bin2str(t[1],L)
+                            if gw == '':
+                                print myprintid,'No gw known for this packet!'
+                            else:
+                                print myprintid,'Updating FwdVid with gw:', gw
+                                packet = updateFwdVid(packet, int(gw,2))
+                                fwdvid_str = gw
+                                fwdvid = int(fwdvid_str, 2)
+                            break
 
                     #RJZ: Still investigating why this is happening...
                     if fwdvid == 0x89abcdef:
@@ -384,17 +384,17 @@ def routepacket(packet):
                 #     though. If we're in the "up the tree" phase, we choose the
                 #     nexthop based off the FwdVid. If we're in the "down the 
                 #     tree" phase, then we choose based on the dst.
-                if int(myvid,2) == fwdvid:
-                    packet = updateFwdVid(packet, int(dst,2))
-                    fwdvid_str = dst
-                    fwdvid = int(fwdvid_str, 2)
+                    if int(myvid,2) == fwdvid:
+                        packet = updateFwdVid(packet, int(dst,2))
+                        fwdvid_str = dst
+                        fwdvid = int(fwdvid_str, 2)
 
-                if int(dst,2) != fwdvid: # up the tree
-                    print myprintid,'Going up the tree'
-                    nexthop = getNextHop(fwdvid_str)
-                else: #down the tree
-                    print myprintid,'Going down the tree'
-                    nexthop = getNextHop(dst)
+                    if int(dst,2) != fwdvid: # up the tree
+                        print myprintid,'Going up the tree'
+                        nexthop = getNextHop(fwdvid_str)
+                    else: #down the tree
+                        print myprintid,'Going down the tree'
+                        nexthop = getNextHop(dst)
 
     # TODO: After we find the nexthop, we test to see if that node is functional
     #       *Use createEchoRequestPacket for this*
@@ -406,15 +406,15 @@ def routepacket(packet):
     #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
                    #using socket connect to test whether the remote host is still working
-                try:
-                    testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    address = nexthop.split(':')
-                    testSocket.connect(address[0], address[1])
-                    testSocket.close()
-                    print myprintid,"The next hop:", nexthop, "is up"
-                    break
-                except:
-                    print myprintid,"The next hop:", nexthop, "is down"
+                     try:
+                         testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                         address = nexthop.split(':')
+                         testSocket.connect(address[0], address[1])
+                         testSocket.close()
+                         print myprintid,"The next hop:", nexthop, "is up"
+                         break
+                     except:
+                         print myprintid,"The next hop:", nexthop, "is down"
               #Chris:-----------------------------------------Code ends here--------------------------------------------
             
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
