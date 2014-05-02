@@ -199,12 +199,12 @@ def processPacket(packet):
     
             # insert entry into routingTable
             routingTable[k].append(bucket_info)
-
+       
     else:
         print myprintid, 'I am the destination and I got the data packet I wanted.'
         
 ###############################################
-#    SPROCESSPACKET FUNCTION ENDS HERE
+#    PROCESSPACKET FUNCTION ENDS HERE
 ###############################################
 ###############################################
 #    getNextHop function starts here
@@ -221,6 +221,18 @@ def getNextHop(destvid_str):
     # calculate logical distance
     dist = delta(myvid,destvid_str)
     
+    #Steve: since it always complains out of index error, I added this block to print out the routingTable beforehand
+    print '\n\t---->In getNextHop function, we print Routing Table at :',myvid,'|',mypid,' <----'
+    for i in range(1,L+1):
+        if i in routingTable:
+            for j in routingTable[i]:
+                print 'Bucket #', i, 'Nexthop:',bin2str(j[0],L), 'Gateway:',bin2str(j[1],L), 'Prefix:',j[2], 'Default:', j[3]
+        else:
+            print 'Bucket #',i,'  --- E M P T Y --- '
+    print 'RDV STORE: ', rdvStore
+    print '\n --  --  --  --  -- --  --  --  --  -- --  --  --  --  -- \n'
+
+ 
     # return node from routingTable with dist
     if dist in routingTable:
         nexthop = bin2str(routingTable[dist][0][0],L)
