@@ -379,11 +379,6 @@ def routepacket(packet):
                 if int(dst,2) != fwdvid: # up the tree
                     print myprintid,'Going up the tree'
                     nexthop = getNextHop(fwdvid_str)
-                    # I just realized that getNexthop was not given, so if we need to use this function, we'll have to implement it ourselves.
-                    #RJZ: It is given. in this file. line 213. I commented out
-                    # your copy paste since it is not needed.
-                    # Please in the future choose more different method names
-                    # getNexthop and getNextHop are easily confused
                 else: #down the tree
                     print myprintid,'Going down the tree'
                     nexthop = getNextHop(dst)
