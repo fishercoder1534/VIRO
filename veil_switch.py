@@ -287,6 +287,8 @@ def routepacket(packet):
 
     # get destination from packet
     dst = getDest(packet,L)
+    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
+    print time.clock(), perfid, packettype, dst
     
     # If destination is me
     if dst == myvid:
@@ -304,7 +306,6 @@ def routepacket(packet):
     
     #Find the next hop
     nexthop = ''
-    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
 
     # RJZ: Decrement TTL
     if packettype == DATA_PKT:
@@ -595,6 +596,7 @@ fin.close() # close vid file
 L = len(myvid)
 
 myprintid = "VEIL_SWITCH: ["+mypid+'|'+myvid+']'
+perfid    = "[PERF_DATA] [",mypid,"] [",myvid,"]"
 
 # Now start my serversocket to listen to the incoming packets         
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
