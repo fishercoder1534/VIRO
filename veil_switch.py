@@ -288,7 +288,7 @@ def routepacket(packet):
     # get destination from packet
     dst = getDest(packet,L)
     packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
-    print time.clock(), perfid, packettype, dst
+    print time.clock(), perfid, "ROUTE", hex(packettype)
     #TODO: we want log messages in the following situations:
     #  any time a packet is dropped
     #  print out nexthop
