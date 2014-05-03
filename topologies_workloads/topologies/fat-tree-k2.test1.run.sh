@@ -1,7 +1,7 @@
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:1001 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:1002 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:1003 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:1004 0 &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4001 0 &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4002 0 &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4003 0 &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4004 0 &
 python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2001 0 &
 python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2002 0 &
 python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2003 0 &

@@ -411,6 +411,11 @@ def routepacket(packet):
     #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
                    # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
                    #using socket connect to test whether the remote host is still working
+
+                #RJZ: workaround until fast failure is fixed. Delete the next
+                # 2 lines.
+                print myprintid,"The next hop:", nexthop, "is up"
+                break
                 try:
                     testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     address = nexthop.split(':')
@@ -611,7 +616,7 @@ fin.close() # close vid file
 L = len(myvid)
 
 myprintid = "VEIL_SWITCH: ["+mypid+'|'+myvid+']'
-perfid    = "[PERF_DATA] [",mypid,"] [",myvid,"]"
+perfid    = "[PERF_DATA] ["+mypid+']['+myvid+']'
 
 # Now start my serversocket to listen to the incoming packets         
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
