@@ -78,9 +78,9 @@ def findAGW(rdvStore,k,svid):
     # return the gateway with least logical distance
     # RJZ: return entire gateway set
     if len(gw) == 1:
-        return (gw[s[0]], '0', '0')
+        return (gw[s[0]], '', '')
     elif len(gw) == 2:
-        return (gw[s[0]], gw[s[1]], '0')
+        return (gw[s[0]], gw[s[1]], '')
     else:
         return (gw[s[0]], gw[s[1]], gw[s[2]])
 
@@ -141,9 +141,16 @@ def processPacket(packet):
         else:
             gw_0 = int(gw0,2)
 
-        # If we dont' have gw1 or gw2, that's fine, set them to 0 instead of ''
-        gw_1 = int(gw1,2)
-        gw_2 = int(gw2,2)
+        # If we dont' have gw1 or gw2, that's fine, set them to 0xfedcba98
+        if gw1 == '':
+            gw_1 = 0xfedcba98
+        else:
+            gw_1 = int(gw1,2)
+
+        if gw2 == '':
+            gw_2 = 0xfedcba98
+        else:
+            gw_2 = int(gw2,2)
         
         # gateway found, form reply packet and sent to svid
         # create a RDV_REPLY packet and send it
@@ -181,7 +188,8 @@ def processPacket(packet):
                 default = False
 
             # gw == 0 is a indication that this entry should be skipped
-            if gw == 0:
+            if hex(gw) == hex(0xfedcba98):
+                print 'continue'
                 continue
         
             # get nextHop using routingTable to reach Gateway [gw0_str]    
