@@ -235,8 +235,10 @@ def getNextHop(destvid_str):
  
     # return node from routingTable with dist
     if dist in routingTable:
-        nexthop = bin2str(routingTable[dist][0][0],L)
-        nexthop = vid2pid[nexthop]
+        for t in routingTable[dist]:
+            nexthop = bin2str(t[0],L)
+            nexthop = vid2pid[nexthop]
+
 
     return nexthop
     
