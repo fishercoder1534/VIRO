@@ -78,9 +78,9 @@ def findAGW(rdvStore,k,svid):
     # return the gateway with least logical distance
     # RJZ: return entire gateway set
     if len(gw) == 1:
-        return (gw[s[0]], '', '')
+        return (gw[s[0]], '0', '0')
     elif len(gw) == 2:
-        return (gw[s[0]], gw[s[1]], '')
+        return (gw[s[0]], gw[s[1]], '0')
     else:
         return (gw[s[0]], gw[s[1]], gw[s[2]])
 
@@ -141,16 +141,9 @@ def processPacket(packet):
         else:
             gw_0 = int(gw0,2)
 
-        # If we dont' have gw1 or gw2, that's fine, set them to 0xfedcba98
-        if gw1 == '':
-            gw_1 = 0xfedcba98
-        else:
-            gw_1 = int(gw1,2)
-
-        if gw2 == '':
-            gw_2 = 0xfedcba98
-        else:
-            gw_2 = int(gw2,2)
+        # If we dont' have gw1 or gw2, that's fine, set them to 0 instead of ''
+        gw_1 = int(gw1,2)
+        gw_2 = int(gw2,2)
         
         # gateway found, form reply packet and sent to svid
         # create a RDV_REPLY packet and send it
@@ -188,8 +181,7 @@ def processPacket(packet):
                 default = False
 
             # gw == 0 is a indication that this entry should be skipped
-            if hex(gw) == hex(0xfedcba98):
-                print 'continue'
+            if gw == 0:
                 continue
         
             # get nextHop using routingTable to reach Gateway [gw0_str]    
@@ -243,10 +235,8 @@ def getNextHop(destvid_str):
  
     # return node from routingTable with dist
     if dist in routingTable:
-        for t in routingTable[dist]:
-            nexthop = bin2str(t[0],L)
-            nexthop = vid2pid[nexthop]
-
+        nexthop = bin2str(routingTable[dist][0][0],L)
+        nexthop = vid2pid[nexthop]
 
     return nexthop
     
@@ -278,207 +268,238 @@ def sendPacket(packet,nexthop):
 ###############################################
 #    routepacket function starts here
 ###############################################
-
-
-'''
-RJZ: I took a stab at it below:
-'''
-
 def routepacket(packet):
+    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
+
+    if packettype == DATA_PKT:
+        processDataPkt(packet)
+    else:
+        processCtlPkt(packet)
+
+###############################################
+#    routepacket FUNCTION ENDS HERE
+###############################################
+
+###############################################
+#    processDataPkt function starts here
+##############################################
+def processDataPkt(packet):
     global myvid, routingTable, vid2pid, myprintid, L
-
-    # TODO: Modify fwd_vid if we're connected to the traffic-gen
-    #       We are connected to the traffic-gen if fwd_vid is 0x89abcdef
-
-    # Source must set the initial TTL
-    # RJZ: Initial TTL is set by traffic-gen.py
-    # Destination must strip TTL
-    # RJZ: I don't think we'll need to worry about stripping off the TTL
 
     # get destination from packet
     dst = getDest(packet,L)
-    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
-    print time.clock(), perfid, "ROUTE", hex(packettype)
+    packettype = getOperation(packet)
+
     #TODO: we want log messages in the following situations:
     #  any time a packet is dropped
     #  print out nexthop
     #  print out when each control packet is created and sent
     #  print out when a node fails
+    print time.clock(), packettype, dst
+
+    #if TTL equals 0, drop the packet
+    if not checkTTL(packet):
+        return
 
     # If destination is me
     if dst == myvid:
         #print 'I am the destination!'
         processPacket(packet)
         return
-    
+
     #If destination is one of my physical neighbor
-    #Chris:I think we should put this code
-    #in the blcok which deals with data_pkt or control pkt depending on the  type of the packet 
-    
     if dst in vid2pid:
         sendPacket(packet,vid2pid[dst])
         return
-    
+
+    #forward the packet according to the fwd
+    fwd, packet = handleFWD(packet)
+    if fwd == '':
+        print "no corresponding fwd found in the routing table"
+        return
+
+    fwd_str = bin2str(fwd,L)
+    dist = delta(fwd_str, myvid)
+
+    if dist in routingTable:
+        while len(routingTable[dist]) > 0:
+            #select the gateway with the closest XOR distance to the fwd
+            index = 0                                                       #index of the closest gateway
+            minimum = float("inf")
+
+            for i in range(0, len(routingTable[dist])):
+                distance = fwd ^ routingTable[dist][i][1]
+
+                if distance < minimum:
+                    index = i
+                    minimum = distance
+
+            nextHop = bin2str(routingTable[dist][index][0],L)                #next hop of the closest gateway
+            nextHop = vid2pid[nextHop]
+
+            if checkConnection(nextHop):
+                    sendPacket(packet, nextHop)
+                    break
+            else:
+                del routingTable[dist][index]
+
+        #all next hops of the gateway are down
+        if len(routingTable[dist]) <= 0:
+            print "all of the next hops are down"
+    else:
+        #no record
+        print "no record found the the routing table"
+###############################################
+#    processDataPkt ends here
+##############################################
+###############################################
+#    handleFWD starts here
+##############################################
+def handleFWD(packet):
+    global myvid, routingTable, vid2pid, myprintid, L
+
+    fwdvid_str = getFwdVid(packet,L)
+    fwdvid = int(fwdvid_str, 2)
+    dst = getDest(packet, L)
+    dist = delta(dst, myvid)
+    print myprintid,'FwdVid is:', hex(fwdvid)
+
+    #chech whether the node is the source node
+    if fwdvid == 0x89abcdef:
+        print myprintid,'I am a source router!'
+
+        if dist in routingTable and len(routingTable[dist]) > 0:
+            index = 0                                                       #index of the closest gateway
+            minimum = float("inf")
+
+            for i in range(0, len(routingTable[dist])):
+                distance = int(myvid, 2) ^ routingTable[dist][i][1]
+
+                if distance < minimum:
+                    index = i
+                    minimum = distance
+
+            fwdvid = routingTable[dist][index][1]
+        else:
+            fwdvid = ''
+
+    #if the node is the gateway
+    if int(myvid,2) == fwdvid:
+        packet = updateFwdVid(packet, int(dst,2))
+        fwdvid_str = dst
+        fwdvid = int(fwdvid_str, 2)
+
+    return fwdvid, packet
+
+###############################################
+#    handleFWD function ends here
+##############################################
+###############################################
+#    processCtlPkt function starts here
+##############################################
+def processCtlPkt(packet):
+    global myvid, routingTable, vid2pid, myprintid, L
+
+    # get destination from packet
+    dst = getDest(packet,L)
+
+    # If destination is me
+    if dst == myvid:
+        #print 'I am the destination!'
+        processPacket(packet)
+        return
+
+    #If destination is one of my physical neighbor
+    if dst in vid2pid:
+        sendPacket(packet,vid2pid[dst])
+        return
+
     #Find the next hop
     nexthop = ''
-
-    # RJZ: Decrement TTL
-    if packettype == DATA_PKT:
-        ttl_orig = getTTL(packet,L)
-        ttl = int(ttl_orig,2) - 1
-
-        # RJZ: if TTL is 0, drop packet
-        if ttl <= 0:
-            print myprintid, 'Dropped packet due to TTL expiration!'
-            return
-        else:
-            print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
-            packet = updateTTL(packet, ttl)
-            ttl_orig = getTTL(packet,L)
-
-        #RJZ: Moved this block below
-
-    # TODO: Question: what happens if we run out of nexthops?
-    #       notify source? drop packet?
-    #       Steve: based on what I learned from the TA, we'll just drop the 
-    #       packet if we run out of nexthops. 
+    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
 
     while nexthop == '':
         if dst in vid2pid:
             nexthop = vid2pid[dst]
             break
 
-        # Calculate logical distance with destination    
+        # Calculate logical distance with destination
         dist = delta(myvid,dst)
-        
+
         if dist == 0:
             break
-            
+
         if dist in routingTable:
-            for t in routingTable[dist]:
-                nexthop = bin2str(t[0],L)
-                nexthop = vid2pid[nexthop]
+            nexthop = bin2str(routingTable[dist][0][0],L)
+            nexthop = vid2pid[nexthop]
+            break
 
-            #Chris: I think the code marked below should be in the for block
-            #Chris: -------------------------code start here-----------------------------------
-            if packettype == DATA_PKT:
-                fwdvid_str = getFwdVid(packet,L)
-                fwdvid = int(fwdvid_str, 2)
-                print myprintid,'FwdVid is:', hex(fwdvid)
-                if fwdvid == 0x89abcdef:
-                    print myprintid,'I am a source router!'
-
-                    for t in routingTable[dist]:
-                        print myprintid,'Getting gw for level', dist
-                        gw = bin2str(t[1],L)
-                        if gw == '':
-                            print myprintid,'No gw known for this packet!'
-                        else:
-                            print myprintid,'Updating FwdVid with gw:', gw
-                            packet = updateFwdVid(packet, int(gw,2))
-                            fwdvid_str = gw
-                            fwdvid = int(fwdvid_str, 2)
-                        break
-
-                    #RJZ: Still investigating why this is happening...
-                    if fwdvid == 0x89abcdef:
-                        print myprintid,'Route disappeared from table...'
-                        break
-
-                # RJZ: Moved this chunk of code to the location where we're
-                #      actually determining the nexthop
-                # TODO: Choose path based on forwarding directive to support 
-                #       multi-path routing
-                #       So here we just need to implement the multi-path routing
-                #       based on FwdVid: match one's own vid to FwdVid, if it 
-                #       matches, then reset it with the dest vid, if not, try 
-                #       to find the nexthop.
-                #Steve: I'll take a stab here, it's not complete, please feel 
-                #       free to modify it or give me hints:
-                #RJZ: I think your implementation is good. One thing below
-                #     though. If we're in the "up the tree" phase, we choose the
-                #     nexthop based off the FwdVid. If we're in the "down the 
-                #     tree" phase, then we choose based on the dst.
-                if int(myvid,2) == fwdvid:
-                    packet = updateFwdVid(packet, int(dst,2))
-                    fwdvid_str = dst
-                    fwdvid = int(fwdvid_str, 2)
-
-                if int(dst,2) != fwdvid: # up the tree
-                    print myprintid,'Going up the tree'
-                    nexthop = getNextHop(fwdvid_str)
-                else: #down the tree
-                    print myprintid,'Going down the tree'
-                    nexthop = getNextHop(dst)
-
-    # TODO: After we find the nexthop, we test to see if that node is functional
-    #       *Use createEchoRequestPacket for this*
-    #Steve: so the TA just corrected his idea and I've forwarded his email to you gusy, we'll not be able to simply use "ping".
-    #       if so, send to that node
-    #       if not, we update the routing table: remove this record from table
-    #         *Use routingTable.remove()* 
- 
-    #Chris: routingTable is a dictionary and then you can use the builtin function to remove items in it. e.g: del routingTable[dst]
-                   # echoReply = ping(nextHop) # ping is not pre-defined and we cannot use ping any more as the TA commented
-                   #using socket connect to test whether the remote host is still working
-
-                #RJZ: workaround until fast failure is fixed. Delete the next
-                # 2 lines.
-                print myprintid,"The next hop:", nexthop, "is up"
-                break
-                try:
-                    testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    address = nexthop.split(':')
-                    testSocket.connect((address[0], address[1]))
-                    testSocket.close()
-                    print myprintid,"The next hop:", nexthop, "is up"
-                    break
-                except socket.error, v:
-                    print myprintid,"The next hop:", nexthop, "is down"
-                    errorcode=v[0]
-                    if errorcode==errno.ECONNREFUSED:
-                        print "Connection Refused"
-                    else:
-                        print "Another error", errorcode
-                    #TODO: 3 problems
-                    # why is the nexthop always down?
-                    # if next hop is down, we need to find a new nexthop
-                    # we need to remove the down entry from the routingTable
-                    # if getNextHop return '', drop the packet (return)
-              #Chris:-----------------------------------------Code ends here--------------------------------------------
-            
         if (packettype != RDV_PUBLISH) and (packettype != RDV_QUERY):
-            break 
-        
+            break
+
         print myprintid,'No next hop for destination: ',dst,'dist: ', dist
         # flip the dist bit to
         dst = flipBit(dst,dist)
-         
+
     #print 'MyVID: ', myvid, 'DEST: ', dst
     if dst != getDest(packet,L):
         # update the destination on the packet
-        packet = updateDestination(packet,dst)
-        
+        updateDestination(packet,dst)
+
     if dst == myvid:
         #print "I am the destination for this RDV Q/P message:"
         printPacket(packet,L)
         processPacket(packet)
-        
+
     if nexthop == '':
         print myprintid,'no route to destination' ,'MyVID: ', myvid, 'DEST: ', dst
         printPacket(packet,L)
         return
-    
-    print myprintid, 'Sending packet to', nexthop
-    printPacket(packet,L)
+
     sendPacket(packet,nexthop)
+###############################################
+#    processCtlPkt function ends here
+##############################################
 
 ###############################################
-#    routepacket FUNCTION ENDS HERE
+#    checkTTL function starts here
+##############################################
+def checkTTL(packet):
+    global myvid, routingTable, vid2pid, myprintid, L
+
+    ttl_orig = getTTL(packet,L)
+    ttl = int(ttl_orig,2) - 1
+
+    # RJZ: if TTL is 0, drop packet
+    if ttl <= 0:
+        print myprintid, 'Dropped packet due to TTL expiration!'
+        return False
+    else:
+        print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
+        packet = updateTTL(packet, ttl)
+        return True
 ###############################################
+#    checkTTL function ends here
+##############################################
+###############################################
+#    checkTTL function ends here
+##############################################
+def checkConnection(nextHop):
+    try:
+        testSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        address = nextHop.split(":")
+        testSocket.connect((address[0], int(address[1])))
+        testSocket.close()
+        return True
+    except socket.errno as e:
+        print e
+        return False
+###############################################
+#    checkTTL function ends here
+##############################################
 ###############################################
 #    Publish function starts here
-###############################################
+##############################################
 
 def publish(bucket,k):
     global myvid, publishCounter
@@ -626,7 +647,7 @@ fin.close() # close vid file
 L = len(myvid)
 
 myprintid = "VEIL_SWITCH: ["+mypid+'|'+myvid+']'
-perfid    = "[PERF_DATA] ["+mypid+']['+myvid+']'
+perfid    = "[PERF_DATA] [",mypid,"] [",myvid,"]"
 
 # Now start my serversocket to listen to the incoming packets         
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
