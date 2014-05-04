@@ -508,7 +508,7 @@ def checkConnection(nextHop):
         testSocket.connect((address[0], int(address[1])))
         testSocket.close()
         return True
-    except socket.errno as e:
+    except socket.error as e:
         print e
         return False
 ###############################################
