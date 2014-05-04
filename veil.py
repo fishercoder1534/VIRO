@@ -91,6 +91,7 @@ def createSwitchRegistrationReplyPacket(switchvid):
     srcdst_array = getMacArray(switchvid)    
     registrationreply = struct.pack("!HHBBHBBBBBBBBBBBB",HTYPE,PTYPE,HLEN,PLEN,SWITCH_REGISTER_REPLY,srcvid_array[0],srcvid_array[1],srcvid_array[2],srcvid_array[3],srcvid_array[4],srcvid_array[5], srcdst_array[0], srcdst_array[1], srcdst_array[2], srcdst_array[3], srcdst_array[4], srcdst_array[5])
     return registrationreply
+
 # convert operation number into a string
 def getOperationName(operation):
     if operation in OPERATION_NAMES:
@@ -120,6 +121,7 @@ def createSwitchRegistrationReplyPacket1(srcvid,dstvid):
     srcdst_array = getMacArray(dstvid)    
     reply = struct.pack("!HHBBHBBBBBBBBBBBB",HTYPE,PTYPE,HLEN,PLEN,SWITCH_REGISTER_REPLY,srcvid_array[0],srcvid_array[1],srcvid_array[2],srcvid_array[3],srcvid_array[4],srcvid_array[5], srcdst_array[0], srcdst_array[1], srcdst_array[2], srcdst_array[3], srcdst_array[4], srcdst_array[5])
     return reply
+
 # create a store_request packet:
 def createStorePacket(ip_to_store,vid_to_store,src_vid,dst_vid):
     # Packet Structure

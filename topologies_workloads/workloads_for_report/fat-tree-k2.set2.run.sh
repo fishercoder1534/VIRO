@@ -18,8 +18,8 @@ python ../../veil_switch.pyc ../topologies/fat-tree-k2.adlist ../topologies/fat-
 python ../../veil_switch.pyc ../topologies/fat-tree-k2.adlist ../topologies/fat-tree-k2.vid localhost:3006 0 &
 python ../../veil_switch.pyc ../topologies/fat-tree-k2.adlist ../topologies/fat-tree-k2.vid localhost:3007 0 &
 python ../../veil_switch.pyc ../topologies/fat-tree-k2.adlist ../topologies/fat-tree-k2.vid localhost:3008 0 &
-python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ../topologies/fat-tree-k2.set2.workload localhost:3001 &
-python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ../topologies/fat-tree-k2.set2.workload localhost:3007 &
-python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ../topologies/fat-tree-k2.set2.workload localhost:3003 &
-python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ../topologies/fat-tree-k2.set2.workload localhost:3005 & 
+python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ./fat-tree-k2.set2.workload localhost:3001 &
+python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ./fat-tree-k2.set2.workload localhost:3007 &
+python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ./fat-tree-k2.set2.workload localhost:3003 &
+python ../../traffic-gen.pyc ../topologies/fat-tree-k2.vid ./fat-tree-k2.set2.workload localhost:3005 & 
 

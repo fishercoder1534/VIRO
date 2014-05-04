@@ -157,6 +157,7 @@ def processPacket(packet):
         # RJZ: Pass three gateways here
         print myprintid, 'gw0: ', gw_0, ' gw1: ', gw_1, ' gw2: ', gw_2
         replypacket = createRDV_REPLY(gw_0,gw_1,gw_2,k,myvid,svid)
+        print perfid, time.clock(), "CREATE", hex(RDV_REPLY)
         routepacket(replypacket)
         return
         
@@ -280,18 +281,18 @@ def routepacket(packet):
     packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
 
     if packettype == DATA_PKT:
-        processDataPkt(packet)
+        routeDataPkt(packet)
     else:
-        processCtlPkt(packet)
+        routeCtlPkt(packet)
 
 ###############################################
 #    routepacket FUNCTION ENDS HERE
 ###############################################
 
 ###############################################
-#    processDataPkt function starts here
+#    routeDataPkt function starts here
 ##############################################
-def processDataPkt(packet):
+def routeDataPkt(packet):
     global myvid, routingTable, vid2pid, myprintid, L
 
     # get destination from packet
@@ -306,6 +307,7 @@ def processDataPkt(packet):
 
     #if TTL equals 0, drop the packet
     if not checkTTL(packet):
+        print perfid, time.clock(), "DROP", hex(packettype), dst
         return
 
     # If destination is me
@@ -324,6 +326,7 @@ def processDataPkt(packet):
     fwd, packet = handleFWD(packet)
     if fwd == '':
         print "no corresponding fwd found in the routing table"
+        print perfid, time.clock(), "DROP", hex(packettype), dst
         return
 
     fwd_str = bin2str(fwd,L)
@@ -354,12 +357,14 @@ def processDataPkt(packet):
 
         #all next hops of the gateway are down
         if len(routingTable[dist]) <= 0:
+            print perfid, time.clock(), "DROP", hex(packettype), dst
             print "all of the next hops are down"
     else:
         #no record
+        print perfid, time.clock(), "DROP", hex(packettype), dst
         print "no record found the the routing table"
 ###############################################
-#    processDataPkt ends here
+#    routeDataPkt ends here
 ##############################################
 ###############################################
 #    handleFWD starts here
@@ -404,9 +409,9 @@ def handleFWD(packet):
 #    handleFWD function ends here
 ##############################################
 ###############################################
-#    processCtlPkt function starts here
+#    routeCtlPkt function starts here
 ##############################################
-def processCtlPkt(packet):
+def routeCtlPkt(packet):
     global myvid, routingTable, vid2pid, myprintid, L
 
     #Find the next hop
@@ -464,12 +469,13 @@ def processCtlPkt(packet):
     if nexthop == '':
         print myprintid,'no route to destination' ,'MyVID: ', myvid, 'DEST: ', dst
         printPacket(packet,L)
+        print perfid, time.clock(), "DROP", hex(packettype), dst
         return
 
     print perfid, time.clock(), "ROUTE", hex(packettype), nexthop
     sendPacket(packet,nexthop)
 ###############################################
-#    processCtlPkt function ends here
+#    routeCtlPkt function ends here
 ##############################################
 
 ###############################################
@@ -518,6 +524,7 @@ def publish(bucket,k):
     print 'publishCounter = ', publishCounter
     dst = getRendezvousID(k,myvid)
     packet = createRDV_PUBLISH(bucket,myvid,dst)
+    print perfid, time.clock(), "CREATE", hex(RDV_PUBLISH)
     print myprintid, 'Publishing my neighbor', bin2str(bucket[0],L), 'to rdv:',dst
     printPacket(packet,L)
     routepacket(packet)
@@ -536,6 +543,7 @@ def query(k):
     print 'queryCounter = ', queryCounter   
     dst = getRendezvousID(k,myvid)
     packet = createRDV_QUERY(k,myvid,dst)
+    print perfid, time.clock(), "CREATE", hex(RDV_QUERY)
     print myprintid, 'Quering to reach Bucket:',k, 'to rdv:',dst
     printPacket(packet,L)
     routepacket(packet)
