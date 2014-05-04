@@ -303,7 +303,6 @@ def processDataPkt(packet):
     #  print out nexthop
     #  print out when each control packet is created and sent
     #  print out when a node fails
-    print time.clock(), packettype, dst
 
     #if TTL equals 0, drop the packet
     if not checkTTL(packet):
@@ -317,6 +316,7 @@ def processDataPkt(packet):
 
     #If destination is one of my physical neighbor
     if dst in vid2pid:
+        print perfid, time.clock(), "ROUTE", hex(packettype), vid2pid[dst]
         sendPacket(packet,vid2pid[dst])
         return
 
@@ -346,8 +346,9 @@ def processDataPkt(packet):
             nextHop = vid2pid[nextHop]
 
             if checkConnection(nextHop):
-                    sendPacket(packet, nextHop)
-                    break
+                print perfid, time.clock(), "ROUTE", hex(packettype), nextHop
+                sendPacket(packet, nextHop)
+                break
             else:
                 del routingTable[dist][index]
 
@@ -408,6 +409,10 @@ def handleFWD(packet):
 def processCtlPkt(packet):
     global myvid, routingTable, vid2pid, myprintid, L
 
+    #Find the next hop
+    nexthop = ''
+    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
+
     # get destination from packet
     dst = getDest(packet,L)
 
@@ -419,12 +424,9 @@ def processCtlPkt(packet):
 
     #If destination is one of my physical neighbor
     if dst in vid2pid:
+        print perfid, time.clock(), "ROUTE", hex(packettype), vid2pid[dst]
         sendPacket(packet,vid2pid[dst])
         return
-
-    #Find the next hop
-    nexthop = ''
-    packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
 
     while nexthop == '':
         if dst in vid2pid:
@@ -464,6 +466,7 @@ def processCtlPkt(packet):
         printPacket(packet,L)
         return
 
+    print perfid, time.clock(), "ROUTE", hex(packettype), nexthop
     sendPacket(packet,nexthop)
 ###############################################
 #    processCtlPkt function ends here
@@ -655,7 +658,7 @@ fin.close() # close vid file
 L = len(myvid)
 
 myprintid = "VEIL_SWITCH: ["+mypid+'|'+myvid+']'
-perfid    = "[PERF_DATA] [",mypid,"] [",myvid,"]"
+perfid    = "[PERF_DATA] ["+mypid+'|'+myvid+']'
 
 # Now start my serversocket to listen to the incoming packets         
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

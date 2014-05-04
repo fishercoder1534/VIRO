@@ -29,10 +29,10 @@ function usage {
     echo "-a: adlist: specify adlist file to parse"
 }
 
-function display_packet_count {
-    banner "Total packet count"
+function display_data_packet_count {
+    banner "Total data packet count"
     npackets=`cat $LOGFILE | grep "\[PERF_DATA\]" | grep "INJECT" | wc -l`
-    echo "Found $npackets packets routed through network"
+    echo "Found $npackets data packets injected into the network"
 }
 
 function display_hop_count {
@@ -73,10 +73,10 @@ function display_link_traffic_count {
     banner "Traffic on each link"
     srcs=`cat $ADLISTFILE | awk '{ print $1 }'`
     for src in $srcs; do
-        dsts=`cat $ADLISTFILE | grep ^$src | sed s/$src//g`
+        dsts=`cat $ADLISTFILE | grep ^$src | sed s/$src//g | tr -d '\n'`
         for dst in $dsts; do
-            echo "$src -> $dst: ? packets"
-            # TODO - once we have the nexthop printout, we can get the counts
+            npackets=`cat $LOGFILE | grep "\[PERF_DATA\]" | grep "ROUTE" | grep $src\| | grep $dst | wc -l`
+            echo $src "->" $dst "$npackets packets"
         done
     done
 }
@@ -146,7 +146,7 @@ fi
 
 #main
 set_hop_count
-display_packet_count
+display_data_packet_count
 display_hop_count
 display_hop_count_for_each_router
 display_link_traffic_count
