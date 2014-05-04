@@ -13,6 +13,23 @@ from constants import *
 
 perfid    = "[PERF_DATA] [traffic_gen]"
 
+#######################################
+#    Performance Log messges
+#######################################
+def perf_message(*msg):
+    # not so graceful with varargs, but this will work
+    if (len(msg) == 1):
+        print time.time(), perfid, msg[0]
+    elif (len(msg) == 2):
+        print time.time(), perfid, msg[0], msg[1]
+    elif (len(msg) == 3):
+        print time.time(), perfid, msg[0], msg[1], msg[2]
+    elif (len(msg) == 4):
+        print time.time(), perfid, msg[0], msg[1], msg[2], msg[3]
+    else:
+        print time.time(), perfid, "bad format given to perf_message"
+    sys.stdout.flush()
+
 def parse_files():
     pid2vid = {} # mapping pid to vid
     rates = {} # mapping dst_vid to traffic rate
@@ -55,7 +72,7 @@ def gen_traffic(my_ip_pt, pkt, rate):
             conn.connect(my_ip_pt)
             conn.send(pkt)
             conn.close() # one-shot, non-persistent for simplicity
-            print time.clock(), perfid, "0x0", my_ip_pt, "INJECT"
+            perf_message("INJECT", my_ip_pt)
             sys.stdout.flush()
         except:
             print "Failed to send packets to", my_ip_pt

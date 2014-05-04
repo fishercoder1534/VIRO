@@ -4,8 +4,12 @@ VIDFILE=''
 ADLISTFILE=''
 LOGFILE=''
 ROUTERS=''
+DATACOUNT=0
+CTRLCOUNT=0
 HOPCOUNT=0
 PERFFILE=/tmp/.perffile
+TIME0=0
+TIME_FINAL=0
 
 DATA=0x0
 ARP_REQUEST=0x01
@@ -30,10 +34,31 @@ function usage {
     echo "-a: adlist: specify adlist file to parse"
 }
 
-function display_data_packet_count {
+function display_packet_count {
+    # All data packets
     banner "Total data packet count"
-    npackets=`cat $PERFFILE | grep "INJECT" | wc -l`
-    echo "Found $npackets data packets injected into the network"
+    echo "Found $DATACOUNT data packets injected into the network"
+
+    # All control packets
+    banner "Total control packet count"
+    echo "Found $CTRLCOUNT control packets injected into the network"
+
+    # For each packet type:
+    banner "Packets by type"
+    display_count_pt $DATA "DATA"
+    display_count_pt $ARP_REQUEST "ARP_REQUEST"
+    display_count_pt $ARP_REPLY "ARP_REPLY"
+    display_count_pt $R_ARP_REQUEST "R_ARP_REQUEST"
+    display_count_pt $R_ARP_REPLY "R_ARP_REPLY"
+    display_count_pt $ECHO_REQUEST "ECHO_REQUEST"
+    display_count_pt $ECHO_REPLY "ECHO_REPLY"
+    display_count_pt $STORE_REQUEST "STORE_REQUEST"
+    display_count_pt $STORE_REPLY "STORE_REPLY"
+    display_count_pt $SWITCH_REGISTRATION_REQUEST "SWITCH_REGISTRATION_REQUEST"
+    display_count_pt $SWITCH_REGISRATION_REPLY "SWITCH_REGISRATION_REPLY"
+    display_count_pt $RDV_PUBLISH "RDV_PUBLISH"
+    display_count_pt $RDV_QUERY "RDV_QUERY"
+    display_count_pt $RDV_REPLY "RDV_REPLY"
 }
 
 function display_hop_count {
@@ -88,13 +113,59 @@ function display_link_traffic_count {
 
 function display_loss_count {
     banner "Packet loss counts"
+    total_pkt_count=$(( DATACOUNT + CTRLCOUNT ))
     drop_count=`cat $PERFFILE | grep "DROP" | wc -l`
-    drop_perc=`fmt_percentage $drop_count $HOPCOUNT`
+    drop_perc=`fmt_percentage $drop_count $total_pkt_count`
     printf "Dropped %4d packets; %6s of traffic\n" $drop_count $drop_perc
+}
+
+function display_initial_convergence_time {
+    banner "Initial convergence time"
+    first_data_pkt=`cat $PERFFILE | grep "INJECT" | head -1`
+    first_data_pkt_time=`fmt_time $first_data_pkt`
+    printf "System injected first data packet after %s sec.\n" $first_data_pkt_time
+    last_ctrl_pkt=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | tail -1`
+    last_ctrl_pkt_time=`fmt_time $last_ctrl_pkt`
+    printf "System injected last RDV_REPLY packet at %s sec.\n" $last_ctrl_pkt_time
+}
+
+function display_failure_convergence_times {
+    banner "Failure convergence time"
+    fail_count=`cat $PERFFILE | grep "NODE_FAIL" | wc -l`
+    if [ $fail_count -eq 0 ]; then
+        echo "No node failures detected."
+        return
+    fi
+    for idx in $(seq 1 $fail_count); do
+        fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | head -1 `
+        fail_time=`fmt_time $fail_time_str`
+        printf "Failure at %s sec into run\n" $fail_time
+    done
+}
+
+function set_data_count {
+    DATACOUNT=`cat $PERFFILE | grep "INJECT" | wc -l`
+}
+
+function set_ctrl_count {
+    CTRLCOUNT=`cat $PERFFILE | grep "CREATE" | wc -l`
 }
 
 function set_hop_count {
     HOPCOUNT=`cat $PERFFILE | grep "ROUTE" | wc -l`
+}
+
+
+# Args: $1: Packet Type
+#       $2: Packet Type String
+function display_count_pt {
+    ptype=$1
+    ptype_str=$2
+    npackets=`cat $PERFFILE | grep "CREATE" | grep $ptype | wc -l`
+    if [ $npackets -ne 0 ]; then
+        utilization=`fmt_percentage $npackets $CTRLCOUNT`
+        printf "Found %4d %-11s packet hops through network; %6s of all control packets\n" $npackets $ptype_str $utilization
+    fi
 }
 
 # Args: $1: Packet Type
@@ -107,6 +178,23 @@ function display_hop_count_pt {
         utilization=`fmt_percentage $npackets $HOPCOUNT`
         printf "Found %4d %-11s packet hops through network; %6s of traffic\n" $npackets $ptype_str $utilization
     fi
+}
+
+# Args: $1: Time from PERFFILE
+function fmt_time {
+    time_sec=`echo $1 | tr '.' ' ' | awk '{ printf $1 }'`
+    time_msec=`echo $1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time=`printf "%d.%2.2d" $time_sec $time_msec`
+    time_difference $time $TIME0
+}
+
+function set_times {
+    time0_sec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $1 }'`
+    time0_msec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    TIME0=`printf "%d.%2.2d" $time0_sec $time0_msec`
+    time_final_sec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $1 }'`
+    time_final_msec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    TIME_FINAL=`printf "%d.%2.2d" $time_final_sec $time_final_msec`
 }
 
 # Args: $1: Message
@@ -124,6 +212,13 @@ function fmt_percentage {
     perc_lo=$(( percent % 100 ))
     printf "%2d.%2.2d%%\n" $perc_hi $perc_lo
 }
+
+# Args: $1: time_a
+#       $4: time_b
+# Display timeA - timeB
+function time_difference {
+    echo "${1}-${2}" | bc
+}    
 
 #Parse command line options
 while getopts "hf:v:a:" arg; do
@@ -167,19 +262,28 @@ if [ "$LOGFILE" == "" -o "$VIDFILE" == "" -o "$ADLISTFILE" == "" ]; then
     exit 1
 fi
 
-
-
 #main
 #parse down log file to just the relevant bits
-cat $LOGFILE | grep "\[PERF_DATA\]" > $PERFFILE
+sort $LOGFILE | grep "\[PERF_DATA\]" > $PERFFILE
+
+#Set globals with some stats which will be used in various displays
+set_times
+set_data_count
+set_ctrl_count
+set_hop_count
+
+# Display run time
+t=`time_difference $TIME_FINAL $TIME0`
+printf "\nNetwork ran for %s sec.\n" $t
 
 #display performance data
-set_hop_count
-display_data_packet_count
+display_packet_count
 display_hop_count
 display_hop_count_for_each_router
 display_link_traffic_count
 display_loss_count
+display_initial_convergence_time
+display_failure_convergence_times
 
 #cleanup
 rm $PERFFILE

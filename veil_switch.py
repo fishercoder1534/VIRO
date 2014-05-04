@@ -8,6 +8,23 @@ from veil import * # for the constants.
 from threading import Thread
 
 #######################################
+#    Performance Log messges
+#######################################
+def perf_message(*msg):
+    # not so graceful with varargs, but this will work
+    if (len(msg) == 1):
+        print time.time(), perfid, msg[0]
+    elif (len(msg) == 2):
+        print time.time(), perfid, msg[0], msg[1]
+    elif (len(msg) == 3):
+        print time.time(), perfid, msg[0], msg[1], msg[2]
+    elif (len(msg) == 4):
+        print time.time(), perfid, msg[0], msg[1], msg[2], msg[3]
+    else:
+        print time.time(), perfid, "bad format given to perf_message"
+    sys.stdout.flush()
+
+#######################################
 #    Server Port THREAD FUNCTION
 #######################################
 def serverThread(server_socket):
@@ -103,6 +120,7 @@ def processPacket(packet):
     # I am the destination of the packet, so process it.
     packettype = getOperation(packet) # ie. RDV_REPLY / RDV_QUERY / RDV_PUBLISH / DATA?
     print myprintid, 'Processing packet'
+    perf_message("ARRIVED", hex(packettype), dst)
     printPacket(packet,L)
     
     # extract source vid from packet
@@ -157,7 +175,7 @@ def processPacket(packet):
         # RJZ: Pass three gateways here
         print myprintid, 'gw0: ', gw_0, ' gw1: ', gw_1, ' gw2: ', gw_2
         replypacket = createRDV_REPLY(gw_0,gw_1,gw_2,k,myvid,svid)
-        print perfid, time.clock(), "CREATE", hex(RDV_REPLY)
+        perf_message("CREATE", hex(RDV_REPLY))
         routepacket(replypacket)
         return
         
@@ -307,7 +325,7 @@ def routeDataPkt(packet):
 
     #if TTL equals 0, drop the packet
     if not checkTTL(packet):
-        print perfid, time.clock(), "DROP", hex(packettype), dst
+        perf_message("DROP", hex(packettype), dst)
         return
 
     # If destination is me
@@ -318,7 +336,7 @@ def routeDataPkt(packet):
 
     #If destination is one of my physical neighbor
     if dst in vid2pid:
-        print perfid, time.clock(), "ROUTE", hex(packettype), vid2pid[dst]
+        perf_message("ROUTE", hex(packettype), vid2pid[dst])
         sendPacket(packet,vid2pid[dst])
         return
 
@@ -326,7 +344,7 @@ def routeDataPkt(packet):
     fwd, packet = handleFWD(packet)
     if fwd == '':
         print "no corresponding fwd found in the routing table"
-        print perfid, time.clock(), "DROP", hex(packettype), dst
+        perf_message("DROP", hex(packettype), dst)
         return
 
     fwd_str = bin2str(fwd,L)
@@ -349,19 +367,20 @@ def routeDataPkt(packet):
             nextHop = vid2pid[nextHop]
 
             if checkConnection(nextHop):
-                print perfid, time.clock(), "ROUTE", hex(packettype), nextHop
+                perf_message("ROUTE", hex(packettype), nextHop)
                 sendPacket(packet, nextHop)
                 break
             else:
+                perf_message("NODE_FAIL", nextHop)
                 del routingTable[dist][index]
 
         #all next hops of the gateway are down
         if len(routingTable[dist]) <= 0:
-            print perfid, time.clock(), "DROP", hex(packettype), dst
+            perf_message("DROP", hex(packettype), dst)
             print "all of the next hops are down"
     else:
         #no record
-        print perfid, time.clock(), "DROP", hex(packettype), dst
+        perf_message("DROP", hex(packettype), dst)
         print "no record found the the routing table"
 ###############################################
 #    routeDataPkt ends here
@@ -429,7 +448,7 @@ def routeCtlPkt(packet):
 
     #If destination is one of my physical neighbor
     if dst in vid2pid:
-        print perfid, time.clock(), "ROUTE", hex(packettype), vid2pid[dst]
+        perf_message("ROUTE", hex(packettype), vid2pid[dst])
         sendPacket(packet,vid2pid[dst])
         return
 
@@ -469,10 +488,10 @@ def routeCtlPkt(packet):
     if nexthop == '':
         print myprintid,'no route to destination' ,'MyVID: ', myvid, 'DEST: ', dst
         printPacket(packet,L)
-        print perfid, time.clock(), "DROP", hex(packettype), dst
+        perf_message("DROP", hex(packettype), dst)
         return
 
-    print perfid, time.clock(), "ROUTE", hex(packettype), nexthop
+    perf_message("ROUTE", hex(packettype), nexthop)
     sendPacket(packet,nexthop)
 ###############################################
 #    routeCtlPkt function ends here
@@ -524,7 +543,7 @@ def publish(bucket,k):
     print 'publishCounter = ', publishCounter
     dst = getRendezvousID(k,myvid)
     packet = createRDV_PUBLISH(bucket,myvid,dst)
-    print perfid, time.clock(), "CREATE", hex(RDV_PUBLISH)
+    perf_message("CREATE", hex(RDV_PUBLISH))
     print myprintid, 'Publishing my neighbor', bin2str(bucket[0],L), 'to rdv:',dst
     printPacket(packet,L)
     routepacket(packet)
@@ -543,7 +562,7 @@ def query(k):
     print 'queryCounter = ', queryCounter   
     dst = getRendezvousID(k,myvid)
     packet = createRDV_QUERY(k,myvid,dst)
-    print perfid, time.clock(), "CREATE", hex(RDV_QUERY)
+    perf_message("CREATE", hex(RDV_QUERY))
     print myprintid, 'Quering to reach Bucket:',k, 'to rdv:',dst
     printPacket(packet,L)
     routepacket(packet)
@@ -728,4 +747,5 @@ while Up:
 
 
 print "VEIL_SWITCH: ["+mypid+'|'+myvid+'] has been terminated!'
+sys.stdout.flush()
 
