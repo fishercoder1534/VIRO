@@ -31,13 +31,13 @@ python ../../veil_switch.pyc ../topologies/isp-level3.adlist ../topologies/isp-l
 python ../../veil_switch.pyc ../topologies/isp-level3.adlist ../topologies/isp-level3.vid localhost:8031 0 > isps3_030.runshout &
 python ../../veil_switch.pyc ../topologies/isp-level3.adlist ../topologies/isp-level3.vid localhost:8032 0 > isps3_031.runshout &
 python ../../veil_switch.pyc ../topologies/isp-level3.adlist ../topologies/isp-level3.vid localhost:8033 0 > isps3_032.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8001 > isps3_033.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8006 > isps3_034.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8026 > isps3_035.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8018 > isps3_036.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8023 > isps3_037.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8004 > isps3_038.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8010 > isps3_039.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8012 > isps3_040.runshout &
-python ../../traffic-gen.pyc ../topologies/isp-level3.vid ../topologies/isp-level3.workload localhost:8032 > isps3_041.runshout & 
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8001 > isps3_033.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8006 > isps3_034.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8026 > isps3_035.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8018 > isps3_036.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8023 > isps3_037.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8004 > isps3_038.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8010 > isps3_039.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8012 > isps3_040.runshout &
+python ../../traffic-gen.pyc ../topologies/isp-level3.vid ./isp-level3.workload localhost:8032 > isps3_041.runshout & 
 
