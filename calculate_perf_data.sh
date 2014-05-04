@@ -276,7 +276,7 @@ fi
 
 #main
 #parse down log file to just the relevant bits
-sort $LOGFILE | grep "^\[PERF_DATA\]" | grep "\[PERF_END\]$" > $PERFFILE
+sort $LOGFILE | grep "^\[PERF_DATA\]" | grep "\[PERF_END\]$" | grep -v "  " > $PERFFILE
 
 #Set globals with some stats which will be used in various displays
 set_times
