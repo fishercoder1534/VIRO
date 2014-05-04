@@ -11,23 +11,27 @@
 import sys, os, random, socket, time, threading, struct
 from constants import *
 
-perfid    = "[PERF_DATA] [traffic_gen]"
+perfid    = "[traffic_gen]"
+perfstr   = "[PERF_DATA]"
+perfstren = "[PERF_END]"
 
 #######################################
 #    Performance Log messges
 #######################################
 def perf_message(*msg):
     # not so graceful with varargs, but this will work
+    sys.stdout.flush()
+    print ""
     if (len(msg) == 1):
-        print time.time(), perfid, msg[0]
+        print perfstr, time.time(), perfid, msg[0], perfstren
     elif (len(msg) == 2):
-        print time.time(), perfid, msg[0], msg[1]
+        print perfstr, time.time(), perfid, msg[0], msg[1], perfstren
     elif (len(msg) == 3):
-        print time.time(), perfid, msg[0], msg[1], msg[2]
+        print perfstr, time.time(), perfid, msg[0], msg[1], msg[2], perfstren
     elif (len(msg) == 4):
-        print time.time(), perfid, msg[0], msg[1], msg[2], msg[3]
+        print perfstr, time.time(), perfid, msg[0], msg[1], msg[2], msg[3], perfstren
     else:
-        print time.time(), perfid, "bad format given to perf_message"
+        print perfstr, time.time(), perfid, "bad format given to perf_message", perfstren
     sys.stdout.flush()
 
 def parse_files():

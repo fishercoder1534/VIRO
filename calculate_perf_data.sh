@@ -121,10 +121,10 @@ function display_loss_count {
 
 function display_initial_convergence_time {
     banner "Initial convergence time"
-    first_data_pkt=`cat $PERFFILE | grep "INJECT" | head -1`
+    first_data_pkt=`cat $PERFFILE | grep "INJECT" | head -1 | awk '{ printf $2 }'`
     first_data_pkt_time=`fmt_time $first_data_pkt`
     printf "System injected first data packet after %s sec.\n" $first_data_pkt_time
-    last_ctrl_pkt=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | tail -1`
+    last_ctrl_pkt=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | tail -1 | awk '{ printf $2 }'`
     last_ctrl_pkt_time=`fmt_time $last_ctrl_pkt`
     printf "System injected last RDV_REPLY packet at %s sec.\n" $last_ctrl_pkt_time
 }
@@ -137,10 +137,22 @@ function display_failure_convergence_times {
         return
     fi
     for idx in $(seq 1 $fail_count); do
-        fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | head -1 `
+        fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | head -1  | awk '{ printf $2 }'`
         fail_time=`fmt_time $fail_time_str`
         printf "Failure at %s sec into run\n" $fail_time
     done
+}
+
+function display_rdv_reply_times {
+    banner "RDV_REPLY packets"
+    times=''
+    rdv_reply_pkts=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | awk '{ print $2_ }' | sed 's/_/ /g'`
+    for pkt in $rdv_reply_pkts; do
+        rdv_reply_time=`fmt_time $pkt`
+        echo "RDV_REPLY message after $rdv_reply_time sec"
+        # times=`echo $times $rdv_reply_time`
+    done
+    # echo $times
 }
 
 function set_data_count {
@@ -183,17 +195,17 @@ function display_hop_count_pt {
 # Args: $1: Time from PERFFILE
 function fmt_time {
     time_sec=`echo $1 | tr '.' ' ' | awk '{ printf $1 }'`
-    time_msec=`echo $1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time_msec=`echo $1 | tr '.' ' ' | awk '{ printf $2 }' | sed 's/0\([0-9]\)/\1/g'`
     time=`printf "%d.%2.2d" $time_sec $time_msec`
     time_difference $time $TIME0
 }
 
 function set_times {
-    time0_sec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $1 }'`
-    time0_msec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time0_sec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time0_msec=`cat $PERFFILE | head -1 | tr '.' ' ' | awk '{ printf $3 }'`
     TIME0=`printf "%d.%2.2d" $time0_sec $time0_msec`
-    time_final_sec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $1 }'`
-    time_final_msec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time_final_sec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $2 }'`
+    time_final_msec=`cat $PERFFILE | tail -1 | tr '.' ' ' | awk '{ printf $3 }'`
     TIME_FINAL=`printf "%d.%2.2d" $time_final_sec $time_final_msec`
 }
 
@@ -264,7 +276,7 @@ fi
 
 #main
 #parse down log file to just the relevant bits
-sort $LOGFILE | grep "\[PERF_DATA\]" > $PERFFILE
+sort $LOGFILE | grep "^\[PERF_DATA\]" | grep "\[PERF_END\]$" > $PERFFILE
 
 #Set globals with some stats which will be used in various displays
 set_times
@@ -282,8 +294,9 @@ display_hop_count
 display_hop_count_for_each_router
 display_link_traffic_count
 display_loss_count
+display_rdv_reply_times
 display_initial_convergence_time
 display_failure_convergence_times
 
-#cleanup
-rm $PERFFILE
+# #cleanup
+# rm $PERFFILE
