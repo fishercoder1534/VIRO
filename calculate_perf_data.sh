@@ -140,10 +140,11 @@ function display_failure_convergence_times {
         echo "No node failures detected."
         return
     fi
-    for idx in $(seq 1 $fail_count); do
-        fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | head -1  | awk '{ printf $2 }'`
+    for idx in $(seq 0 $(( fail_count - 1 ))); do
+        fail_node=`cat $PERFFILE | grep "NODE_FAIL" | tail -$(( fail_count - idx )) | head -1  | awk '{ printf $3 }'`
+        fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | tail -$(( fail_count - idx )) | head -1  | awk '{ printf $2 }'`
         fail_time=`fmt_time $fail_time_str`
-        printf "Failure at %s sec into run\n" $fail_time
+        printf "Failure of %s at %s sec into run\n" $fail_node $fail_time
     done
 }
 
