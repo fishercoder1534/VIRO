@@ -373,7 +373,7 @@ def routeDataPkt(packet):
                 sendPacket(packet, nextHop)
                 break
             else:
-                perf_message("ROUTE_DELETED", nextHop)
+                perf_message("DELETED", nextHop)
                 del routingTable[dist][index]
 
         #all next hops of the gateway are down
