@@ -1,0 +1,183 @@
+Reading in ../topologies/fat-tree-k2.vid
+Reading in ../topologies/fat-tree-k2.adlist
+Reading in fat-tree-k2.set2.run.output
+
+Network ran for 117.53 sec.
+
+##### Total data packet count   #####
+Found 6667 data packets injected into the network
+
+##### Total control packet count #####
+Found 1221 control packets injected into the network
+
+##### Packets by type           #####
+Found  811 RDV_PUBLISH packet hops through network; 66.42% of all control packets
+Found  367 RDV_QUERY   packet hops through network; 30.05% of all control packets
+Found   43 RDV_REPLY   packet hops through network;  3.52% of all control packets
+
+##### Total hop count           #####
+Found 9427 hops through network
+
+##### Hops by packet type       #####
+Found 8206 DATA        packet hops through network; 87.04% of traffic
+Found  726 RDV_PUBLISH packet hops through network;  7.70% of traffic
+Found  424 RDV_QUERY   packet hops through network;  4.49% of traffic
+Found   71 RDV_REPLY   packet hops through network;  0.75% of traffic
+
+##### Hops for each router      #####
+Found  100 packets passed through router localhost:4001;  1.06% of traffic
+Found 1658 packets passed through router localhost:2001; 17.58% of traffic
+Found 1518 packets passed through router localhost:2003; 16.10% of traffic
+Found  129 packets passed through router localhost:2005;  1.36% of traffic
+Found  273 packets passed through router localhost:2007;  2.89% of traffic
+Found  150 packets passed through router localhost:4002;  1.59% of traffic
+Found   81 packets passed through router localhost:4003;  0.85% of traffic
+Found  171 packets passed through router localhost:2002;  1.81% of traffic
+Found 2813 packets passed through router localhost:2004; 29.83% of traffic
+Found 2778 packets passed through router localhost:2006; 29.46% of traffic
+Found   87 packets passed through router localhost:2008;  0.92% of traffic
+Found 2741 packets passed through router localhost:4004; 29.07% of traffic
+Found 1593 packets passed through router localhost:3001; 16.89% of traffic
+Found   70 packets passed through router localhost:3002;  0.74% of traffic
+Found 1480 packets passed through router localhost:3003; 15.69% of traffic
+Found 1383 packets passed through router localhost:3004; 14.67% of traffic
+Found 1406 packets passed through router localhost:3005; 14.91% of traffic
+Found  162 packets passed through router localhost:3006;  1.71% of traffic
+Found  195 packets passed through router localhost:3007;  2.06% of traffic
+Found   66 packets passed through router localhost:3008;  0.70% of traffic
+
+##### Traffic on each link      #####
+localhost:4001 -> localhost:2005     1 packets;  0.01% of traffic
+localhost:4002 -> localhost:2001   104 packets;  1.10% of traffic
+localhost:4002 -> localhost:2003     2 packets;  0.02% of traffic
+localhost:4003 -> localhost:2002    16 packets;  0.16% of traffic
+localhost:4004 -> localhost:2002    39 packets;  0.41% of traffic
+localhost:4004 -> localhost:2004  1361 packets; 14.43% of traffic
+localhost:2001 -> localhost:4002     3 packets;  0.03% of traffic
+localhost:2001 -> localhost:3001    60 packets;  0.63% of traffic
+localhost:2002 -> localhost:4003     1 packets;  0.01% of traffic
+localhost:2002 -> localhost:4004     3 packets;  0.03% of traffic
+localhost:2002 -> localhost:3001     3 packets;  0.03% of traffic
+localhost:2003 -> localhost:4002    41 packets;  0.43% of traffic
+localhost:2003 -> localhost:3003    20 packets;  0.21% of traffic
+localhost:2004 -> localhost:4003    64 packets;  0.67% of traffic
+localhost:2004 -> localhost:3003     3 packets;  0.03% of traffic
+localhost:2005 -> localhost:3005     1 packets;  0.01% of traffic
+localhost:2006 -> localhost:4004  1338 packets; 14.19% of traffic
+localhost:2007 -> localhost:4001    99 packets;  1.05% of traffic
+localhost:2007 -> localhost:3007     1 packets;  0.01% of traffic
+localhost:2008 -> localhost:3007    64 packets;  0.67% of traffic
+localhost:3001 -> localhost:2001  1444 packets; 15.31% of traffic
+localhost:3002 -> localhost:2001    45 packets;  0.47% of traffic
+localhost:3003 -> localhost:2003  1411 packets; 14.96% of traffic
+localhost:3004 -> localhost:2003    42 packets;  0.44% of traffic
+localhost:3005 -> localhost:2005    23 packets;  0.24% of traffic
+localhost:3006 -> localhost:2005   102 packets;  1.08% of traffic
+localhost:3007 -> localhost:2007   130 packets;  1.37% of traffic
+localhost:3008 -> localhost:2007    41 packets;  0.43% of traffic
+
+##### Packet loss counts        #####
+Dropped 5328 packets; 67.54% of traffic
+Routing table modification at 0      sec into run; found    0 ctrl packets thus far
+Routing table modification at 0      sec into run; found    0 ctrl packets thus far
+Routing table modification at 0      sec into run; found    0 ctrl packets thus far
+Routing table modification at 0      sec into run; found    0 ctrl packets thus far
+Routing table modification at .14    sec into run; found    0 ctrl packets thus far
+Routing table modification at .14    sec into run; found    0 ctrl packets thus far
+Routing table modification at .14    sec into run; found    0 ctrl packets thus far
+Routing table modification at .14    sec into run; found    0 ctrl packets thus far
+Routing table modification at .23    sec into run; found    0 ctrl packets thus far
+Routing table modification at .23    sec into run; found    0 ctrl packets thus far
+Routing table modification at .23    sec into run; found    0 ctrl packets thus far
+Routing table modification at .23    sec into run; found    0 ctrl packets thus far
+Routing table modification at .83    sec into run; found    0 ctrl packets thus far
+Routing table modification at .83    sec into run; found    0 ctrl packets thus far
+Routing table modification at .83    sec into run; found    0 ctrl packets thus far
+Routing table modification at .83    sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.18   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.18   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.64   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.64   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.64   sec into run; found    0 ctrl packets thus far
+Routing table modification at 1.64   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.28   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.28   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.32   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.32   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.38   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.38   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.38   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.38   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 2.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.12   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.33   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.33   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.33   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.33   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.50   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.50   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.70   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.70   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.70   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.70   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.59   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.59   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.59   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.59   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.79   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.79   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.79   sec into run; found    0 ctrl packets thus far
+Routing table modification at 3.79   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.15   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.15   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.15   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.15   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 4.62   sec into run; found    0 ctrl packets thus far
+Routing table modification at 5.15   sec into run; found    4 ctrl packets thus far
+Routing table modification at 10.15  sec into run; found   24 ctrl packets thus far
+Routing table modification at 12.33  sec into run; found   40 ctrl packets thus far
+Routing table modification at 13.14  sec into run; found   48 ctrl packets thus far
+Routing table modification at 13.51  sec into run; found   52 ctrl packets thus far
+Routing table modification at 15.02  sec into run; found   66 ctrl packets thus far
+Routing table modification at 15.15  sec into run; found   72 ctrl packets thus far
+Routing table modification at 15.16  sec into run; found   74 ctrl packets thus far
+Routing table modification at 15.16  sec into run; found   74 ctrl packets thus far
+Routing table modification at 16.13  sec into run; found   81 ctrl packets thus far
+Routing table modification at 17.22  sec into run; found   88 ctrl packets thus far
+Routing table modification at 17.33  sec into run; found   95 ctrl packets thus far
+Routing table modification at 17.33  sec into run; found   95 ctrl packets thus far
+Routing table modification at 18.09  sec into run; found  104 ctrl packets thus far
+Routing table modification at 18.71  sec into run; found  109 ctrl packets thus far
+Routing table modification at 18.71  sec into run; found  109 ctrl packets thus far
+Routing table modification at 18.79  sec into run; found  113 ctrl packets thus far
+Routing table modification at 18.79  sec into run; found  113 ctrl packets thus far
+Routing table modification at 20.15  sec into run; found  129 ctrl packets thus far
+Routing table modification at 20.18  sec into run; found  132 ctrl packets thus far
+Routing table modification at 20.20  sec into run; found  134 ctrl packets thus far
+Routing table modification at 20.25  sec into run; found  135 ctrl packets thus far
+Routing table modification at 22.34  sec into run; found  162 ctrl packets thus far
+Routing table modification at 22.40  sec into run; found  162 ctrl packets thus far
+Routing table modification at 23.14  sec into run; found  171 ctrl packets thus far
+Routing table modification at 23.14  sec into run; found  171 ctrl packets thus far
+Routing table modification at 23.52  sec into run; found  175 ctrl packets thus far
+Routing table modification at 23.82  sec into run; found  191 ctrl packets thus far
+Routing table modification at 23.82  sec into run; found  191 ctrl packets thus far
+Routing table modification at 23.82  sec into run; found  191 ctrl packets thus far
+Routing table modification at 24.63  sec into run; found  195 ctrl packets thus far
+Routing table modification at 24.63  sec into run; found  195 ctrl packets thus far
+Routing table modification at 24.63  sec into run; found  195 ctrl packets thus far
+Routing table modification at 27.31  sec into run; found  227 ctrl packets thus far
+Routing table modification at 27.31  sec into run; found  227 ctrl packets thus far
+
+##### Failure convergence time  #####
+Failure of [localhost:4001|10010] at 18.35 sec into run
+Failure of [localhost:4003|00010] at 28.79 sec into run
