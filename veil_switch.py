@@ -373,7 +373,7 @@ def routeDataPkt(packet):
                 sendPacket(packet, nextHop)
                 break
             else:
-                perf_message("NODE_FAIL", nextHop)
+                perf_message("ROUTE_DELETED", nextHop)
                 del routingTable[dist][index]
 
         #all next hops of the gateway are down
@@ -750,6 +750,7 @@ while Up:
         time.sleep(ROUND_TIME)
 
 
+perf_message("NODE_FAIL")
 print "VEIL_SWITCH: ["+mypid+'|'+myvid+'] has been terminated!'
 sys.stdout.flush()
 
