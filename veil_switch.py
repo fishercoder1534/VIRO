@@ -208,7 +208,7 @@ def processPacket(packet):
                 gw = gw2
                 default = False
 
-            # gw == 0 is a indication that this entry should be skipped
+            # gw == 0xfedcba98 is a indication that this entry should be skipped
             if hex(gw) == hex(0xfedcba98):
                 print 'continue'
                 continue
@@ -227,6 +227,7 @@ def processPacket(packet):
             bucket_info = [nh, gw, getPrefix(myvid,k), default]
     
             # insert entry into routingTable
+            perf_message("APPEND", "RTMODIFY")
             routingTable[k].append(bucket_info)
        
     else:
@@ -373,7 +374,7 @@ def routeDataPkt(packet):
                 sendPacket(packet, nextHop)
                 break
             else:
-                perf_message("DELETED", nextHop)
+                perf_message("DELETE", "RTMODIFY", nextHop)
                 del routingTable[dist][index]
 
         #all next hops of the gateway are down
@@ -728,6 +729,7 @@ for vid in vid2pid: # iterate for every vid in vid2pid list
     bucket_info = [int(vid,2), int(myvid,2), getPrefix(myvid,dist), default]    
     
     if not isDuplicateBucket(routingTable[dist], bucket_info):
+        perf_message("APPEND", "RTMODIFY")
         routingTable[dist].append(bucket_info) # add bucket_into to routingTable[dist]
         
 while Up:

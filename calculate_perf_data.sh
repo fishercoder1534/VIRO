@@ -119,21 +119,24 @@ function display_loss_count {
     printf "Dropped %4d packets; %6s of traffic\n" $drop_count $drop_perc
 }
 
-function display_initial_convergence_time {
-    banner "Initial convergence time"
-    first_data_pkt=`cat $PERFFILE | grep "INJECT" | head -1 | awk '{ printf $2 }'`
-    first_data_pkt_time=`fmt_time $first_data_pkt`
-    printf "System injected first data packet after %s sec.\n" $first_data_pkt_time
-    last_ctrl_pkt=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | tail -1 | awk '{ printf $2 }'`
-    last_ctrl_pkt_time=`fmt_time $last_ctrl_pkt`
+function display_convergence_times {
+    rtmodify_count=`cat $PERFFILE | grep "RTMODIFY" | wc -l`
+    if [ $rtmodify_count -eq 0 ]; then
+        echo "No routing table modifications detected."
+        return
+    fi
+    for idx in $(seq 0 $(( rtmodify_count - 1 ))); do
+        rtmodify_line_num=`cat $PERFFILE | grep -n "RTMODIFY" | tail -$(( rtmodify_count - idx )) | head -1 | sed 's/:/ /g' | awk '{ printf $1 }'`
+        rtmodify_time_str=`cat $PERFFILE | grep "RTMODIFY" | tail -$(( rtmodify_count - idx )) | head -1 | awk '{ printf $2 }'`
+        rtmodify_time=`fmt_time $rtmodify_time_str`
 
-    last_ctrl_pkt_line_num=`cat $PERFFILE | grep -n "CREATE" | grep "$RDV_REPLY" | tail -1 | sed 's/:/ /g' | awk '{ printf $1 }'`
-    num_ctrl_pkts_before_line_num=`head -$last_ctrl_pkt_line_num $PERFFILE | grep "CREATE" | wc -l`
-
-    printf "System injected last RDV_REPLY packet at %s sec, found %d ctrl packets up to that point\n" $last_ctrl_pkt_time $num_ctrl_pkts_before_line_num
+        num_ctrl_pkts_before_line_num=`head -$rtmodify_line_num $PERFFILE | grep "CREATE" | wc -l`
+        printf "Routing table modification at %-6s sec into run; found %4d ctrl packets thus far\n" $rtmodify_time $num_ctrl_pkts_before_line_num
+    done
 }
 
-function display_failure_convergence_times {
+
+function display_failure_times {
     banner "Failure convergence time"
     fail_count=`cat $PERFFILE | grep "NODE_FAIL" | wc -l`
     if [ $fail_count -eq 0 ]; then
@@ -146,18 +149,6 @@ function display_failure_convergence_times {
         fail_time=`fmt_time $fail_time_str`
         printf "Failure of %s at %s sec into run\n" $fail_node $fail_time
     done
-}
-
-function display_rdv_reply_times {
-    banner "RDV_REPLY packets"
-    times=''
-    rdv_reply_pkts=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | awk '{ print $2_ }' | sed 's/_/ /g'`
-    for pkt in $rdv_reply_pkts; do
-        rdv_reply_time=`fmt_time $pkt`
-        echo "RDV_REPLY message after $rdv_reply_time sec"
-        # times=`echo $times $rdv_reply_time`
-    done
-    # echo $times
 }
 
 function set_data_count {
@@ -280,8 +271,9 @@ if [ "$LOGFILE" == "" -o "$VIDFILE" == "" -o "$ADLISTFILE" == "" ]; then
 fi
 
 #main
-#parse down log file to just the relevant bits
-sort $LOGFILE | grep "^\[PERF_DATA\]" | grep "\[PERF_END\]$" | grep -v "  " > $PERFFILE
+#parse down log file to just the relevant bits; add a couple checks to make sure
+# we have valid messages, since they are often corrupted
+sort $LOGFILE | grep "^\[PERF_DATA\]" | grep "\[PERF_END\]$" | grep "\." | grep -v "  " > $PERFFILE
 
 #Set globals with some stats which will be used in various displays
 set_times
@@ -299,9 +291,8 @@ display_hop_count
 display_hop_count_for_each_router
 display_link_traffic_count
 display_loss_count
-display_rdv_reply_times
-display_initial_convergence_time
-display_failure_convergence_times
+display_convergence_times
+display_failure_times
 
-# #cleanup
-# rm $PERFFILE
+#cleanup
+rm $PERFFILE
