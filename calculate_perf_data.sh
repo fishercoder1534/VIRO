@@ -126,7 +126,11 @@ function display_initial_convergence_time {
     printf "System injected first data packet after %s sec.\n" $first_data_pkt_time
     last_ctrl_pkt=`cat $PERFFILE | grep "CREATE" | grep "$RDV_REPLY" | tail -1 | awk '{ printf $2 }'`
     last_ctrl_pkt_time=`fmt_time $last_ctrl_pkt`
-    printf "System injected last RDV_REPLY packet at %s sec.\n" $last_ctrl_pkt_time
+
+    last_ctrl_pkt_line_num=`cat $PERFFILE | grep -n "CREATE" | grep "$RDV_REPLY" | tail -1 | sed 's/:/ /g' | awk '{ printf $1 }'`
+    num_ctrl_pkts_before_line_num=`head -$last_ctrl_pkt_line_num $PERFFILE | grep "CREATE" | wc -l`
+
+    printf "System injected last RDV_REPLY packet at %s sec, found %d ctrl packets up to that point\n" $last_ctrl_pkt_time $num_ctrl_pkts_before_line_num
 }
 
 function display_failure_convergence_times {
