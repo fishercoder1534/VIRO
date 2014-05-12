@@ -1,0 +1,119 @@
+Reading in ../topologies/fat-tree-k2.vid
+Reading in ../topologies/fat-tree-k2.adlist
+Reading in fat-tree-k2.set2.run.output
+
+Network ran for 114.66 sec.
+
+##### Total data packet count   #####
+Found 6499 data packets injected into the network
+
+##### Total control packet count #####
+Found 1192 control packets injected into the network
+
+##### Packets by type           #####
+Found  793 RDV_PUBLISH packet hops through network; 66.52% of all control packets
+Found  377 RDV_QUERY   packet hops through network; 31.62% of all control packets
+Found   22 RDV_REPLY   packet hops through network;  1.84% of all control packets
+
+##### Total hop count           #####
+Found 19539 hops through network
+
+##### Hops by packet type       #####
+Found 18348 DATA        packet hops through network; 93.90% of traffic
+Found  721 RDV_PUBLISH packet hops through network;  3.69% of traffic
+Found  448 RDV_QUERY   packet hops through network;  2.29% of traffic
+Found   22 RDV_REPLY   packet hops through network;  0.11% of traffic
+
+##### Hops for each router      #####
+Found   96 packets passed through router localhost:4001;  0.49% of traffic
+Found 3501 packets passed through router localhost:2001; 17.91% of traffic
+Found 1367 packets passed through router localhost:2003;  6.99% of traffic
+Found  129 packets passed through router localhost:2005;  0.66% of traffic
+Found 1887 packets passed through router localhost:2007;  9.65% of traffic
+Found 3456 packets passed through router localhost:4002; 17.68% of traffic
+Found  106 packets passed through router localhost:4003;  0.54% of traffic
+Found 2800 packets passed through router localhost:2002; 14.33% of traffic
+Found 4073 packets passed through router localhost:2004; 20.84% of traffic
+Found 3067 packets passed through router localhost:2006; 15.69% of traffic
+Found 2714 packets passed through router localhost:2008; 13.89% of traffic
+Found 5741 packets passed through router localhost:4004; 29.38% of traffic
+Found 1458 packets passed through router localhost:3001;  7.46% of traffic
+Found 1718 packets passed through router localhost:3002;  8.79% of traffic
+Found  492 packets passed through router localhost:3003;  2.51% of traffic
+Found 3340 packets passed through router localhost:3004; 17.09% of traffic
+Found 1406 packets passed through router localhost:3005;  7.19% of traffic
+Found  163 packets passed through router localhost:3006;  0.83% of traffic
+Found  184 packets passed through router localhost:3007;  0.94% of traffic
+Found 1379 packets passed through router localhost:3008;  7.05% of traffic
+
+##### Traffic on each link      #####
+localhost:4001 -> localhost:2005     1 packets;  0.00% of traffic
+localhost:4002 -> localhost:2001  1727 packets;  8.83% of traffic
+localhost:4002 -> localhost:2003    31 packets;  0.15% of traffic
+localhost:4003 -> localhost:2002     8 packets;  0.04% of traffic
+localhost:4004 -> localhost:2002    39 packets;  0.19% of traffic
+localhost:4004 -> localhost:2004  1443 packets;  7.38% of traffic
+localhost:2001 -> localhost:4002    32 packets;  0.16% of traffic
+localhost:2001 -> localhost:3001    57 packets;  0.29% of traffic
+localhost:2002 -> localhost:4003     1 packets;  0.00% of traffic
+localhost:2002 -> localhost:4004  1318 packets;  6.74% of traffic
+localhost:2002 -> localhost:3001     3 packets;  0.01% of traffic
+localhost:2003 -> localhost:4002    38 packets;  0.19% of traffic
+localhost:2003 -> localhost:3003    19 packets;  0.09% of traffic
+localhost:2004 -> localhost:4003    97 packets;  0.49% of traffic
+localhost:2004 -> localhost:3003     2 packets;  0.01% of traffic
+localhost:2005 -> localhost:4001     1 packets;  0.00% of traffic
+localhost:2005 -> localhost:3005     1 packets;  0.00% of traffic
+localhost:2006 -> localhost:4004  1625 packets;  8.31% of traffic
+localhost:2007 -> localhost:4001    94 packets;  0.48% of traffic
+localhost:2007 -> localhost:4002  1628 packets;  8.33% of traffic
+localhost:2007 -> localhost:3007     1 packets;  0.00% of traffic
+localhost:2008 -> localhost:3007    60 packets;  0.30% of traffic
+localhost:3002 -> localhost:2001    55 packets;  0.28% of traffic
+localhost:3003 -> localhost:2003   411 packets;  2.10% of traffic
+localhost:3004 -> localhost:2003   867 packets;  4.43% of traffic
+localhost:3005 -> localhost:2005    21 packets;  0.10% of traffic
+localhost:3006 -> localhost:2005   103 packets;  0.52% of traffic
+localhost:3007 -> localhost:2007   123 packets;  0.62% of traffic
+localhost:3008 -> localhost:2007    39 packets;  0.19% of traffic
+
+##### Punt counts               #####
+ 35128 punts due to no forward; 33.74% of punts
+ 39422 punts due to no nexthop; 37.87% of punts
+ 29543 punts due to no record; 28.38% of punts
+
+##### Packet loss counts        #####
+Dropped 1633 packets; 21.23% of traffic
+    0 drops due to no route;  0.00% of drops
+ 1633 drops due to TTL expiration; 100.00% of drops
+
+##### Failure convergence time  #####
+Failure of [localhost:4001|10010] at 18.06 sec into run
+Failure of [localhost:4003|00010] at 21.98 sec into run
+
+##### Detected node failures    #####
+Detection of down link localhost:4001 at 21.05 sec into run
+Detection of down link localhost:3004 at 76.73 sec into run
+Detection of down link localhost:2003 at 103.60 sec into run
+
+##### Packets arrived at each destination #####
+Found    0 data packets arrived at router localhost:4001;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2001;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2003;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2005;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2007;  0.00% of traffic
+Found    0 data packets arrived at router localhost:4002;  0.00% of traffic
+Found    0 data packets arrived at router localhost:4003;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2002;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2004;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2006;  0.00% of traffic
+Found    0 data packets arrived at router localhost:2008;  0.00% of traffic
+Found    0 data packets arrived at router localhost:4004;  0.00% of traffic
+Found    0 data packets arrived at router localhost:3001;  0.00% of traffic
+Found 1628 data packets arrived at router localhost:3002; 38.68% of traffic
+Found    0 data packets arrived at router localhost:3003;  0.00% of traffic
+Found 1264 data packets arrived at router localhost:3004; 30.03% of traffic
+Found    0 data packets arrived at router localhost:3005;  0.00% of traffic
+Found    0 data packets arrived at router localhost:3006;  0.00% of traffic
+Found    0 data packets arrived at router localhost:3007;  0.00% of traffic
+Found 1316 data packets arrived at router localhost:3008; 31.27% of traffic
