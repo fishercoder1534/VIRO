@@ -111,15 +111,50 @@ function display_link_traffic_count {
     done
 }
 
+function display_punt_count {
+    banner "Punt counts"
+    punt_count=`cat $PERFFILE | grep "PUNT" | wc -l`
+    if [ $punt_count -eq 0 ]; then
+        return
+    fi
+    #NO_FWD
+    nf_count=`cat $PERFFILE | grep "PUNT" | grep "NO_FWD" | wc -l`
+    nf_perc=`fmt_percentage $nf_count $punt_count`
+    printf " %4d punts due to no forward; %6s of punts\n" $nf_count $nf_perc
+    #NO_NH
+    nnh_count=`cat $PERFFILE | grep "PUNT" | grep "NO_NH" | wc -l`
+    nnh_perc=`fmt_percentage $nnh_count $punt_count`
+    printf " %4d punts due to no nexthop; %6s of punts\n" $nnh_count $nnh_perc
+    #NO_RECORD 
+    nrc_count=`cat $PERFFILE | grep "PUNT" | grep "NO_RECORD" | wc -l`
+    nrc_perc=`fmt_percentage $nrc_count $punt_count`
+    printf " %4d punts due to no record; %6s of punts\n" $nrc_count $nrc_perc
+}
+
 function display_loss_count {
     banner "Packet loss counts"
     total_pkt_count=$(( DATACOUNT + CTRLCOUNT ))
     drop_count=`cat $PERFFILE | grep "DROP" | wc -l`
     drop_perc=`fmt_percentage $drop_count $total_pkt_count`
     printf "Dropped %4d packets; %6s of traffic\n" $drop_count $drop_perc
+    
+    if [ $drop_count -eq 0 ]; then
+        return
+    fi
+
+    # Drop types:
+    #NO_ROUTE
+    nr_count=`cat $PERFFILE | grep "DROP" | grep "NO_ROUTE" | wc -l`
+    nr_perc=`fmt_percentage $nr_count $drop_count`
+    printf " %4d drops due to no route; %6s of drops\n" $nr_count $nr_perc
+    #TTL_EXPIRE
+    ttl_count=`cat $PERFFILE | grep "DROP" | grep "TTL_EXPIRE" | wc -l`
+    ttl_perc=`fmt_percentage $ttl_count $drop_count`
+    printf " %4d drops due to TTL expiration; %6s of drops\n" $ttl_count $ttl_perc
 }
 
 function display_convergence_times {
+    banner "Convergence Times"
     rtmodify_count=`cat $PERFFILE | grep "RTMODIFY" | wc -l`
     if [ $rtmodify_count -eq 0 ]; then
         echo "No routing table modifications detected."
@@ -148,6 +183,38 @@ function display_failure_times {
         fail_time_str=`cat $PERFFILE | grep "NODE_FAIL" | tail -$(( fail_count - idx )) | head -1  | awk '{ printf $2 }'`
         fail_time=`fmt_time $fail_time_str`
         printf "Failure of %s at %s sec into run\n" $fail_node $fail_time
+    done
+}
+
+function display_node_failures {
+    banner "Detected node failures"
+    fail_count=`cat $PERFFILE | grep "DELETE" | wc -l`
+    if [ $fail_count -eq 0 ]; then
+        echo "No node failures detected."
+        return
+    fi
+    for idx in $(seq 0 $(( fail_count - 1 ))); do
+        fail_node=`cat $PERFFILE | grep "DELETE" | tail -$(( fail_count - idx )) | head -1  | awk '{ printf $6 }'`
+        fail_time_str=`cat $PERFFILE | grep "DELETE" | tail -$(( fail_count - idx )) | head -1  | awk '{ printf $2 }'`
+        fail_time=`fmt_time $fail_time_str`
+        printf "Detection of down link %s at %s sec into run\n" $fail_node $fail_time
+    done
+}
+
+
+function display_packets_arrived {
+    banner "Packets arrived at each destination"
+    routers=`cat $VIDFILE | awk '{ print $1 }'`
+    total_arrived=`cat $PERFFILE | grep "ARRIVED" | grep $DATA | wc -l`
+    if [ $total_arrived -eq 0 ]; then
+        echo "No data packets sent in this test"
+        return
+    fi
+
+    for router in $routers; do
+        npackets=`cat $PERFFILE | grep "ARRIVED" | grep $router | grep $DATA | wc -l`
+        utilization=`fmt_percentage $npackets $total_arrived`
+        printf "Found %4d data packets arrived at router %s; %6s of traffic\n" $npackets $router $utilization
     done
 }
 
@@ -290,9 +357,12 @@ display_packet_count
 display_hop_count
 display_hop_count_for_each_router
 display_link_traffic_count
+display_punt_count
 display_loss_count
-display_convergence_times
+# display_convergence_times
 display_failure_times
+display_node_failures
+display_packets_arrived
 
 #cleanup
 rm $PERFFILE

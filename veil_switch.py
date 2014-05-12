@@ -311,6 +311,22 @@ def routepacket(packet):
 ###############################################
 
 ###############################################
+#    punt: If we don't have any idea how to route this packet, just send
+#    it to someone else. If nobody can route the packets, let the TTL drop it
+##############################################
+def punt(packet, packettype, dst):
+    for i in range(1,L+1):
+        if i in routingTable:
+            for j in routingTable[i]:
+                print myprintid, "Punting to", bin2str(j[0],L)
+                nexthop = vid2pid[bin2str(j[0],L)]
+                sendPacket(packet, nexthop)
+                return
+    # If we still haven't returned, there are no neibors. Shouldn't happ
+    perf_message("DROP", "NO_FWD", hex(packettype), dst)
+
+
+###############################################
 #    routeDataPkt function starts here
 ##############################################
 def routeDataPkt(packet):
@@ -327,8 +343,9 @@ def routeDataPkt(packet):
     #  print out when a node fails
 
     #if TTL equals 0, drop the packet
-    if not checkTTL(packet):
-        perf_message("DROP", hex(packettype), dst)
+    packet, retval = checkTTL(packet)
+    if retval == False:
+        perf_message("DROP", "TTL_EXPIRE", hex(packettype), dst)
         return
 
     # If destination is me
@@ -346,11 +363,14 @@ def routeDataPkt(packet):
     #forward the packet according to the fwd
     fwd, packet = handleFWD(packet)
     if fwd == '':
-        print "no corresponding fwd found in the routing table"
-        perf_message("DROP", hex(packettype), dst)
+        perf_message("PUNT", "NO_FWD", hex(packettype), dst)
+        print myprintid, "no corresponding fwd found in the routing table"
+        punt(packet, packettype, dst)
         return
 
+
     fwd_str = bin2str(fwd,L)
+    print myprintid, "fwd is now", fwd_str
     dist = delta(fwd_str, myvid)
 
     if dist in routingTable:
@@ -376,15 +396,19 @@ def routeDataPkt(packet):
             else:
                 perf_message("DELETE", "RTMODIFY", nextHop)
                 del routingTable[dist][index]
+                
 
         #all next hops of the gateway are down
         if len(routingTable[dist]) <= 0:
-            perf_message("DROP", hex(packettype), dst)
+            perf_message("PUNT", "NO_NH", hex(packettype), dst)
             print "all of the next hops are down"
+            punt(packet, packettype, dst)
     else:
         #no record
-        perf_message("DROP", hex(packettype), dst)
+        perf_message("PUNT", "NO_RECORD", hex(packettype), dst)
         print "no record found the the routing table"
+        punt(packet, packettype, dst)
+        return
 ###############################################
 #    routeDataPkt ends here
 ##############################################
@@ -398,7 +422,7 @@ def handleFWD(packet):
     fwdvid = int(fwdvid_str, 2)
     dst = getDest(packet, L)
     dist = delta(dst, myvid)
-    print myprintid,'FwdVid is:', hex(fwdvid)
+    print myprintid,'FwdVid is:', hex(fwdvid), 'dist is:', dist
 
     #chech whether the node is the source node
     if fwdvid == 0x89abcdef:
@@ -416,15 +440,18 @@ def handleFWD(packet):
                     minimum = distance
 
             fwdvid = routingTable[dist][index][1]
+            packet = updateFwdVid(packet, fwdvid)
         else:
             fwdvid = ''
+            return fwdvid, packet
 
     #if the node is the gateway
     if int(myvid,2) == fwdvid:
         packet = updateFwdVid(packet, int(dst,2))
-        fwdvid_str = dst
-        fwdvid = int(fwdvid_str, 2)
 
+    fwdvid_str = getFwdVid(packet,L)
+    fwdvid = int(fwdvid_str, 2)
+    print myprintid, 'updating fwdvid to', fwdvid
     return fwdvid, packet
 
 ###############################################
@@ -481,7 +508,7 @@ def routeCtlPkt(packet):
     #print 'MyVID: ', myvid, 'DEST: ', dst
     if dst != getDest(packet,L):
         # update the destination on the packet
-        updateDestination(packet,dst)
+        packet = updateDestination(packet,dst)
 
     if dst == myvid:
         #print "I am the destination for this RDV Q/P message:"
@@ -491,7 +518,7 @@ def routeCtlPkt(packet):
     if nexthop == '':
         print myprintid,'no route to destination' ,'MyVID: ', myvid, 'DEST: ', dst
         printPacket(packet,L)
-        perf_message("DROP", hex(packettype), dst)
+        perf_message("DROP", "NO_ROUTE", hex(packettype), dst)
         return
 
     perf_message("ROUTE", hex(packettype), nexthop)
@@ -512,11 +539,11 @@ def checkTTL(packet):
     # RJZ: if TTL is 0, drop packet
     if ttl <= 0:
         print myprintid, 'Dropped packet due to TTL expiration!'
-        return False
+        return packet, False
     else:
         print myprintid, 'Updated TTL for vid', myvid, 'from', hex(int(ttl_orig,2)), 'to', hex(ttl)
         packet = updateTTL(packet, ttl)
-        return True
+        return packet, True
 ###############################################
 #    checkTTL function ends here
 ##############################################
@@ -529,9 +556,11 @@ def checkConnection(nextHop):
         address = nextHop.split(":")
         testSocket.connect((address[0], int(address[1])))
         testSocket.close()
+        print myprintid, 'Connection to', nextHop, 'is up.'
         return True
     except socket.error as e:
         print e
+        print myprintid, 'Connection to', nextHop, 'is down.'
         return False
 ###############################################
 #    checkTTL function ends here

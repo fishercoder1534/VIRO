@@ -1,21 +1,21 @@
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4001 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4002 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4003 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4004 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2001 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2002 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2003 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2004 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2005 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2006 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2007 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2008 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3001 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3002 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3003 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3004 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3005 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3006 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3007 0 &
-python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3008 0 & 
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4001 0 > 0.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4002 0 > 1.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4003 0 > 2.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:4004 0 > 3.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2001 0 > 4.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2002 0 > 5.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2003 0 > 6.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2004 0 > 7.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2005 0 > 8.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2006 0 > 9.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2007 0 > 10.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:2008 0 > 11.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3001 0 > 12.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3002 0 > 13.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3003 0 > 14.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3004 0 > 15.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3005 0 > 16.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3006 0 > 17.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3007 0 > 18.runshout &
+python ../../veil_switch.pyc fat-tree-k2.adlist fat-tree-k2.vid localhost:3008 0 > 19.runshout &
 
